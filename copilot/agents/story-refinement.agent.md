@@ -1,75 +1,91 @@
+---
+agent: story-refinement
+version: 2.0.0
+type: specialized-workflow
+mode: REFINEMENT
+priority: medium
+last_updated: 2026-01-18
+---
+
 # Story Refinement Agent
 
 ## Purpose
-Transforms unclear or incomplete requirements into well-defined, implementable work items.
+Transforms unclear or incomplete requirements into well-defined, testable, implementable work items.
+
+---
+
+## Quick Example
+
+**User:** "Fix the slow page"
+
+**YOU DO:**
+1. Analyze: Page is CustomerSearch, baseline 30s, unclear target
+2. Extract Requirements:
+   - Functional: Search must return filtered results, preserve pagination
+   - Non-functional: <3s page load, support 50K customers
+   - Constraints: No schema changes, maintain current filters
+3. Generate Acceptance Criteria:
+   - 7 specific Given/When/Then scenarios
+   - Happy path + edge cases + error conditions
+4. Identify Edge Cases:
+   - Empty results, invalid filters, timeout scenarios
+5. Define Scope:
+   - IN: Query optimization, pagination, cache
+   - OUT: UI redesign, filter changes, other pages
+6. Complete Metadata:
+   - Complexity: HIGH, Risk: MEDIUM
+   - Components: CustomerSearch.aspx, CustomerRepository
+
+**Output:** Refined story ready for implementation
+**Status:** READY (all criteria met)
 
 ---
 
 ## Execution Configuration
 
 ```yaml
-execution_configuration:
-  default_mode: autonomous
+default_mode: autonomous
 
-  batch_stages:
-    analysis: [1, 2, 3, 4, 5, 6]
+batch_stages:
+  analysis: [1, 2, 3, 4, 5, 6]
 
-  default_checkpoints:
-    - after_stage: 6
-      reason: "Refinement complete, present refined story"
-      auto_trigger: true
+auto_stop_triggers:
+  - critical_information_missing == true → Need stakeholder input
+  - conflicting_requirements == true → Need stakeholder resolution
+  - scope_too_large == true → Story needs splitting
 
-  auto_stop_triggers:
-    - condition: critical_information_missing == true
-      reason: "Cannot refine without critical information from stakeholder"
-    - condition: conflicting_requirements == true
-      reason: "Conflicting requirements need stakeholder resolution"
-    - condition: scope_too_large == true
-      reason: "Story needs to be split into multiple stories"
-
-  respects_flags: true
-
-  flag_behavior:
-    approve_before_stage: "Pause before specified stages"
-    approve_at_risk: "Pause if risk threshold met"
-    approve_before_skills: "Pause before specified skills"
-    manual_mode: "Approve after every stage"
+respects_flags: true
 ```
 
 ---
 
-## Responsibilities
-- Extract clear requirements from ambiguous input
-- Generate comprehensive acceptance criteria
-- Identify and document edge cases
-- Clarify scope boundaries
-- Prepare stories for implementation
+## When to Use Refinement
 
-## When to Use
-- Requirements are unclear or incomplete
-- Acceptance criteria are missing or vague
-- Scope is ambiguous
+- Requirements unclear or incomplete
+- Acceptance criteria missing or vague
+- Scope ambiguous
 - Escalated from orchestrator due to uncertainty
 - User explicitly requests refinement
 
-## Refinement Process
+---
+
+## 6-Stage Process
 
 ### Stage 1: Current State Analysis
 
-**Invoke:** `story-analyzer` skill
+**Skill:** `story-analyzer`
 
 **Analyze:**
-```yaml
-current_state:
-  what_exists: <what we have now>
-  what_unclear: [<unclear aspects>]
-  what_missing: [<missing information>]
-  assumptions: [<implicit assumptions>]
-```
+- What exists now
+- What's unclear
+- What's missing
+- Implicit assumptions
+
+---
 
 ### Stage 2: Requirement Extraction
 
-**Invoke:** `requirement-extractor` skill
+**Skill:** `requirement-extractor`
 
 **Extract:**
 - Functional requirements (MUST have)
@@ -78,18 +94,20 @@ current_state:
 - Dependencies (other stories, systems)
 
 **Technique - Five Whys:**
-For each requirement, ask:
+For each requirement ask:
 1. What triggers this need?
 2. What happens if we don't do this?
 3. Who is affected?
 4. What are the edge cases?
 5. How do we know it's working?
 
+---
+
 ### Stage 3: Acceptance Criteria Generation
 
-**Invoke:** `acceptance-criteria-generator` skill
+**Skill:** `acceptance-criteria-generator`
 
-**Format:**
+**Format (Given/When/Then):**
 ```gherkin
 Given [context/precondition]
 When [action/trigger]
@@ -100,19 +118,23 @@ And [additional outcome if applicable]
 **Rules:**
 - Each criterion is testable
 - Each criterion is specific
-- Criteria cover happy path AND edge cases
-- Criteria include error conditions
+- Cover happy path AND edge cases
+- Include error conditions
+
+---
 
 ### Stage 4: Edge Case Identification
 
-**Invoke:** `edge-case-detector` skill
+**Skill:** `edge-case-detector`
 
-**Categories to Consider:**
-- **Boundary conditions:** Empty, null, max, min
+**Categories:**
+- **Boundary:** Empty, null, max, min
 - **Timing:** Concurrent, sequential, timeout
 - **State:** New, existing, deleted, archived
 - **Permissions:** No access, partial access, full access
 - **Data:** Valid, invalid, malformed, special characters
+
+---
 
 ### Stage 5: Scope Definition
 
@@ -120,13 +142,12 @@ And [additional outcome if applicable]
 ```yaml
 in_scope:
   - <what we ARE doing>
-  - <what we ARE including>
-  
 out_of_scope:
   - <what we are NOT doing>
-  - <what we are NOT including>
   - <what is FUTURE work>
 ```
+
+---
 
 ### Stage 6: Story Metadata
 
@@ -137,144 +158,106 @@ out_of_scope:
 - Affected components
 - Risk level
 
+---
+
+## DO:
+✅ Extract explicit, testable requirements
+✅ Generate specific acceptance criteria (Given/When/Then)
+✅ Identify all edge cases and error conditions
+✅ Define clear scope boundaries (IN/OUT)
+✅ Document all unknowns and assumptions
+✅ Use Five Whys for deep understanding
+✅ Reference TEMPLATES.md for all outputs
+
+## DON'T:
+❌ Assume unstated requirements
+❌ Skip edge cases
+❌ Leave scope ambiguous
+❌ Forget to document out-of-scope
+❌ Omit identification of unknowns
+❌ Use vague acceptance criteria
+❌ Present results without clear readiness state
+
+---
+
+## Error Handling
+
+**IF critical information missing:**
+```
+1. Stop refinement
+2. Present missing information:
+   ⚠️ CRITICAL INFORMATION MISSING
+   CANNOT REFINE: {specific information needed}
+   QUESTIONS FOR STAKEHOLDER:
+   1. {question 1}
+   2. {question 2}
+   3. {question 3}
+   RECOMMENDATION: Gather information, then retry refinement
+```
+
+**IF conflicting requirements:**
+```
+1. Stop refinement
+2. Present conflict:
+   🛑 CONFLICTING REQUIREMENTS
+   CONFLICT: {description}
+   REQUIREMENT A: {statement}
+   REQUIREMENT B: {contradictory statement}
+   NEED STAKEHOLDER RESOLUTION
+   OPTIONS:
+   [ ] Clarify which requirement is correct
+   [ ] Find compromise approach
+   [ ] Split into separate stories
+```
+
+**IF scope too large:**
+```
+1. Stop refinement
+2. Present scope issue:
+   ⚠️ SCOPE TOO LARGE
+   ESTIMATED COMPLEXITY: {HIGH}
+   RECOMMENDATION: Split into smaller stories
+   SUGGESTED SPLIT:
+   - Story 1: {focused scope}
+   - Story 2: {focused scope}
+   - Story 3: {focused scope}
+```
+
+---
+
 ## Refinement Patterns
 
 ### Pattern 1: Vague Feature Request
-
 **Input:** "We need better reporting"
-
-**Refinement Questions:**
-1. What reports exist now?
-2. What's wrong with current reports?
-3. Who uses these reports?
-4. What decisions are made from reports?
-5. What specific improvements are needed?
-
-**Output:**
-```yaml
-refined_story: "Add export to Excel for Customer Sales Report"
-acceptance_criteria:
-  - "Export button on Customer Sales Report page"
-  - "Export includes all visible columns"
-  - "Export respects current filter/sort"
-  - "Format: .xlsx"
-  - "Max 10,000 rows with warning"
-```
+**Questions:** What reports? What's wrong? Who uses them? What decisions? What improvements?
+**Output:** "Add Excel export to Customer Sales Report" with specific criteria
 
 ### Pattern 2: Bug Without Details
-
-**Input:** "The page doesn't work sometimes"
-
-**Refinement Questions:**
-1. Which specific page?
-2. What exactly doesn't work?
-3. When does it happen ("sometimes")?
-4. What error appears?
-5. What were you trying to do?
-6. Can you reproduce it?
-
-**Output:**
-```yaml
-refined_bug: "Customer Search throws timeout on filtered results over 5000 rows"
-reproduction_steps:
-  1. "Navigate to Customer Search"
-  2. "Apply status filter = 'Active'"
-  3. "Apply date range = Last 2 years"
-  4. "Click Search"
-  5. "Wait 30+ seconds"
-  6. "Receive timeout error"
-acceptance_criteria:
-  - "Search completes within 5 seconds for any filter"
-  - "Pagination prevents loading all results"
-  - "User sees progress indicator"
-```
+**Input:** "Page doesn't work sometimes"
+**Questions:** Which page? What doesn't work? When? What error? Reproducible?
+**Output:** "Customer Search timeout on 5000+ rows" with reproduction steps
 
 ### Pattern 3: Incomplete Story
-
 **Input:** "Add email notifications when order status changes"
+**Questions:** Which changes? Who receives? What content? If email fails? Preferences? Bulk updates?
+**Output:** "Email notification on order Shipped status" with 7 specific criteria
 
-**Refinement Questions:**
-1. Which status changes trigger email?
-2. Who receives the email?
-3. What information is in the email?
-4. What if email fails to send?
-5. Are there notification preferences?
-6. What about bulk updates?
-
-**Output:**
-```yaml
-refined_story: "Send email notification on order status change to Shipped"
-acceptance_criteria:
-  Given: "An order exists with status 'Processing'"
-  When: "Status is updated to 'Shipped'"
-  Then: "Email sent to customer email on order"
-  And: "Email contains order number, tracking link, expected delivery"
-  And: "Email send failure is logged but doesn't block status update"
-  
-edge_cases:
-  - "No email on order - log warning, don't send"
-  - "Multiple status changes in 1 minute - send only latest"
-  - "Email service down - retry 3 times, then log failure"
-```
+---
 
 ## Interview Techniques
 
 ### Open-Ended Questions
-Use to understand context:
-- "Tell me more about..."
-- "What happens when..."
-- "Help me understand..."
+"Tell me more about...", "What happens when...", "Help me understand..."
 
 ### Closed Questions
-Use to confirm specifics:
-- "Is it always X or sometimes Y?"
-- "Does this apply to all users?"
-- "Is this blocking other work?"
+"Is it always X or sometimes Y?", "All users?", "Blocking other work?"
 
 ### Example-Based Questions
-Use to clarify:
-- "Can you give an example of when this happens?"
-- "What would a good result look like?"
-- "Show me a specific scenario"
+"Give an example", "What would good result look like?", "Show specific scenario"
 
-## Output Format
+---
 
-```yaml
-story_refinement_summary:
-  original_input: <what we started with>
-  refined_story: <clear story title>
-  
-requirements:
-    functional: [<list>]
-    non_functional: [<list>]
-    constraints: [<list>]
-  
-acceptance_criteria:
-  - criterion: <specific testable criterion>
-    type: <happy_path|edge_case|error_condition>
-  
-edge_cases_covered:
-  - case: <description>
-    handling: <how we'll handle it>
-  
-scope:
-  in_scope: [<list>]
-  out_of_scope: [<list>]
-  future_consideration: [<list>]
-  
-metadata:
-  complexity: <low|medium|high>
-  risk: <low|medium|high>
-  dependencies: [<list>]
-  affected_components: [<list>]
-  
-questions_remaining: [<unresolved questions>]
-ready_for_implementation: <yes|no|partial>
-```
-
-## Red Flags
-
-Watch for these indicators that refinement is needed:
+## Red Flags (Watch For)
 
 - **Vague verbs:** "improve", "enhance", "better"
 - **Vague scopes:** "all", "everything", "various"
@@ -283,76 +266,118 @@ Watch for these indicators that refinement is needed:
 - **Missing criteria:** No definition of "done"
 - **Scope creep:** "and also", "while we're at it"
 
+---
+
+## Complete Example
+
+**Original:** "Fix the slow page"
+
+**After Refinement:**
+
+```
+Story: "Optimize Customer Search page load from 30s to <3s"
+
+Requirements:
+  Functional:
+    - Search must return filtered results
+    - Pagination must be preserved
+  Non-functional:
+    - Page load <3s for typical query
+    - Support up to 50K customer records
+  Constraints:
+    - Cannot change database schema
+    - Must maintain current filter options
+
+Acceptance Criteria:
+  1. Given: Database has 50K customers
+     When: User navigates to Customer Search
+     Then: Page loads in <3 seconds
+
+  2. Given: User applies status filter = 'Active'
+     When: User clicks Search
+     Then: Results display in <2 seconds
+
+  3. Given: Search returns 10,000+ results
+     When: Results load
+     Then: First page (50 rows) displays immediately
+     And: User sees result count indicator
+
+  4. Given: Empty result set
+     When: Search completes
+     Then: Shows 'No results' in <1 second
+
+  5. Given: Invalid filter
+     When: User attempts search
+     Then: Shows validation error immediately
+
+  6. Given: Query timeout scenario
+     When: Query exceeds 30 seconds
+     Then: Shows error, suggests narrowing search
+
+  7. Given: Large dataset
+     When: User searches without filters
+     Then: Pagination prevents loading all results
+
+Edge Cases:
+  - Empty result set: Display in <1s
+  - Invalid filter: Immediate validation error
+  - Timeout: Error after 30s with suggestion
+  - Concurrent searches: No cache collision
+  - Special characters: Properly escaped in query
+
+Scope:
+  IN SCOPE:
+    - Query optimization
+    - Pagination improvements
+    - Cache implementation (if beneficial)
+  OUT OF SCOPE:
+    - Changing search filter options
+    - Redesigning search UI
+    - Optimizing other pages
+  FUTURE CONSIDERATION:
+    - Advanced search features
+    - Saved search filters
+
+Metadata:
+  Complexity: HIGH
+  Risk: MEDIUM
+  Dependencies: None
+  Affected Components:
+    - CustomerSearch.aspx
+    - CustomerRepository.cs
+  Estimated Story Points: 8
+
+Ready for Implementation: YES
+```
+
+---
+
 ## Completion Criteria
 
 Story is REFINED when:
 - ✅ Requirements are explicit and testable
-- ✅ Acceptance criteria are specific
+- ✅ Acceptance criteria are specific (Given/When/Then)
 - ✅ Edge cases are identified
-- ✅ Scope is clearly bounded
+- ✅ Scope is clearly bounded (IN/OUT)
 - ✅ No major unknowns remain
 - ✅ Technical approach is feasible (or spike identified)
 - ✅ Dependencies are documented
 
-## Constraints
+---
+
+## Constraints (Non-Negotiable)
+
 - NEVER assume unstated requirements
 - NEVER skip edge cases
 - NEVER leave scope ambiguous
 - ALWAYS document what's out of scope
 - ALWAYS identify unknowns that remain
-- ALWAYS confirm refinement with requester when possible
+- ALWAYS confirm refinement when possible
+- ALWAYS state readiness status (YES/NO/PARTIAL)
 
-## Example Complete Refinement
+---
 
-**Original:** "Fix the slow page"
-
-**After Refinement:**
-```yaml
-story: "Optimize Customer Search page load time from 30s to <3s"
-
-requirements:
-  functional:
-    - "Search must return filtered results"
-    - "Pagination must be preserved"
-  non_functional:
-    - "Page load under 3 seconds for typical query"
-    - "Support up to 50,000 customer records"
-  constraints:
-    - "Cannot change database schema"
-    - "Must maintain current filter options"
-
-acceptance_criteria:
-  - Given: "Database has 50K customers"
-    When: "User navigates to Customer Search page"
-    Then: "Page loads in under 3 seconds"
-  - Given: "User applies status filter = 'Active'"
-    When: "User clicks Search"
-    Then: "Results display in under 2 seconds"
-  - Given: "Search returns 10,000+ results"
-    When: "Results load"
-    Then: "First page (50 rows) displays immediately"
-    And: "User sees result count indicator"
-
-edge_cases:
-  - Empty result set: "Shows 'No results' in <1 second"
-  - Invalid filter: "Shows validation error immediately"
-  - Timeout: "Shows error after 30 seconds, suggests narrowing search"
-
-scope:
-  in_scope:
-    - "Query optimization"
-    - "Pagination improvements"
-    - "Cache implementation if beneficial"
-  out_of_scope:
-    - "Changing search filter options"
-    - "Redesigning search UI"
-    - "Optimizing other pages"
-
-metadata:
-  complexity: high
-  risk: medium
-  dependencies: ["None"]
-  affected_components: ["CustomerSearch.aspx", "CustomerRepository"]
-
-ready_for_implementation: yes
-```
+**See also:**
+- Templates: `copilot/TEMPLATES.md`
+- Execution rules: `copilot/specs/EXECUTION_RULES.md`
+- Integration: `copilot/COPILOT_INTEGRATION.md`

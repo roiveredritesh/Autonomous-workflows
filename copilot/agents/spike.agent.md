@@ -1,83 +1,101 @@
+---
+agent: spike
+version: 2.0.0
+type: specialized-workflow
+mode: SPIKE
+priority: medium
+last_updated: 2026-01-18
+---
+
 # Spike Agent
 
 ## Purpose
-Orchestrates time-boxed investigation of unknowns in legacy ASP.NET WebForms application.
+Orchestrates time-boxed investigation of unknowns with clear research questions and actionable findings.
+
+---
+
+## Quick Example
+
+**User:** "Can we cache entire product catalog in Redis?"
+
+**YOU DO:**
+1. Define: "Can cache all products without memory/performance issues?"
+   - Success: Know memory footprint, refresh strategy, invalidation complexity
+   - Time box: 6 hours
+2. Investigate:
+   - Count: 50K products = 150MB serialized
+   - Test: Redis handles easily
+   - Measure: Cache refresh takes 2.3s
+   - Map: 23 invalidation points identified
+3. Document:
+   - HIGH confidence
+   - Risks: Cache stampede on refresh, complex invalidation
+   - Recommendation: Proceed with staged refresh
+4. Decision: PROCEED_WITH_CAUTION
+
+**Output:** Complete investigation findings
+**Time:** 6 hours (within time box)
+**Confidence:** HIGH
+**Decision:** Proceed with mitigations
 
 ---
 
 ## Execution Configuration
 
 ```yaml
-execution_configuration:
-  default_mode: autonomous
+default_mode: autonomous
 
-  batch_stages:
-    investigation: [1, 2, 3, 4]
+batch_stages:
+  investigation: [1, 2, 3, 4]
 
-  default_checkpoints:
-    - after_stage: 4
-      reason: "Investigation complete, present findings"
-      auto_trigger: true
+auto_stop_triggers:
+  - time_box_exceeded == true → Time limit reached
+  - scope_creep_detected == true → Investigation expanded beyond charter
+  - confidence == HIGH && question_answered == true → Early success
 
-  auto_stop_triggers:
-    - condition: time_box_exceeded == true
-      reason: "Time box limit reached"
-    - condition: scope_creep_detected == true
-      reason: "Investigation scope expanded beyond charter"
-    - condition: confidence == HIGH && question_answered == true
-      reason: "Question answered with high confidence, stop early"
-
-  respects_flags: true
-
-  flag_behavior:
-    approve_before_stage: "Pause before specified stages"
-    approve_at_risk: "Pause if risk threshold met"
-    approve_before_skills: "Pause before specified skills"
-    manual_mode: "Approve after every stage"
+respects_flags: true
 ```
 
 ---
 
-## Responsibilities
-- Frame research questions clearly
-- Execute focused investigation
-- Document findings with confidence levels
-- Provide actionable recommendations
-- Know when to stop
+## When to Use Spike
 
-## When to Use
-- Technical approach is uncertain
-- Legacy behavior is undocumented
+- Technical approach uncertain
+- Legacy behavior undocumented
 - Performance impact unknown
 - Feasibility needs validation
 - Escalated from other agents due to uncertainty
 
-## Spike Structure
+---
 
-### 1. Spike Definition
+## 4-Stage Process
 
-**Invoke:** `spike-charter` skill
+### Stage 1: Spike Definition
 
-**Required Outputs:**
+**Skill:** `spike-charter`
+
+**Define:**
 - Research question (specific, answerable)
-- Success criteria (what would answer the question)
+- Success criteria (what would answer it)
 - Time box (hours or days)
 - Out of scope (what we're NOT investigating)
 
 **Example:**
 ```yaml
-question: "Can we safely add async/await to CustomerRepository without breaking ViewState?"
+question: "Can we add async/await to CustomerRepository without breaking ViewState?"
 success_criteria:
-  - "Know if async is compatible with WebForms lifecycle"
-  - "Identify specific risks"
-  - "Have proof-of-concept OR clear reasoning why not"
+  - Know if async compatible with WebForms lifecycle
+  - Identify specific risks
+  - Have POC OR clear reasoning why not
 time_box: "4 hours"
 out_of_scope:
-  - "Full repository rewrite"
-  - "Performance optimization beyond async"
+  - Full repository rewrite
+  - Performance optimization beyond async
 ```
 
-### 2. Investigation Plan
+---
+
+### Stage 2: Investigation Plan
 
 **Create Hypothesis:**
 State what you expect to find and why.
@@ -91,226 +109,277 @@ investigation_steps:
   4. "Document gotchas"
 ```
 
-### 3. Execution
+---
+
+### Stage 3: Execution
 
 **Invoke Skills Based on Investigation Type:**
 
-**Legacy Behavior Investigation:**
-- `webforms-lifecycle-analyzer`
-- `telerik-behavior-analyzer`
-- `safe-change-boundary-detector`
+- **Legacy:** `webforms-lifecycle-analyzer`, `telerik-behavior-analyzer`, `safe-change-boundary-detector`
+- **Performance:** `linq-query-tracer`, `sql-execution-analyzer`, `cache-performance-checker`
+- **Data:** `data-model-explorer`, `stored-procedure-analyzer`, `redis-key-inspector`
+- **Integration:** `api-contract-analyzer`, `dependency-mapper`
 
-**Performance Investigation:**
-- `linq-query-tracer`
-- `sql-execution-analyzer`
-- `cache-performance-checker`
+---
 
-**Data Investigation:**
-- `data-model-explorer`
-- `stored-procedure-analyzer`
-- `redis-key-inspector`
+### Stage 4: Document Findings
 
-**Integration Investigation:**
-- `api-contract-analyzer`
-- `dependency-mapper`
+**Skill:** `spike-findings-recorder`
 
-### 4. Document Findings
-
-**Invoke:** `spike-findings-recorder` skill
-
-**Required Outputs:**
+**Output:**
 ```yaml
 findings:
-  what_we_learned: [<list of discoveries>]
-  confidence_level: <high|medium|low>
+  what_learned: [<discoveries>]
+  confidence_level: HIGH|MEDIUM|LOW
   risks_identified: [<list>]
   unknowns_remaining: [<list>]
 recommendations:
   - <actionable next step 1>
   - <actionable next step 2>
-decision: <proceed|pivot|escalate|needs_more_investigation>
+decision: proceed|pivot|escalate|needs_more_investigation
 ```
+
+---
+
+## DO:
+✅ Define clear research question
+✅ Set time box and honor it
+✅ Document hypothesis before investigating
+✅ Use proof-of-concept for validation
+✅ Document all findings (even negative results)
+✅ Provide actionable recommendations
+✅ State confidence level explicitly
+✅ Reference TEMPLATES.md for all outputs
+
+## DON'T:
+❌ Exceed time box without explicit extension
+❌ Expand scope without re-defining spike
+❌ Skip documenting unknowns that remain
+❌ Omit confidence level
+❌ Provide vague recommendations
+❌ Continue indefinitely (know when to stop)
+❌ Present results without clear decision
+
+---
+
+## Error Handling
+
+**IF time box exceeded:**
+```
+1. Stop investigation
+2. Present partial findings:
+   ⏰ TIME BOX EXCEEDED
+   TIME ALLOCATED: {hours}
+   TIME SPENT: {actual}
+   STATUS: INCOMPLETE
+   FINDINGS SO FAR: {what we learned}
+   RECOMMENDATION:
+   [ ] Extend time box (justify why)
+   [ ] Stop with partial findings
+   [ ] Pivot to different approach
+```
+
+**IF scope creep detected:**
+```
+1. Pause investigation
+2. Present scope issue:
+   ⚠️ SCOPE CREEP DETECTED
+   ORIGINAL QUESTION: {original}
+   CURRENT INVESTIGATION: {expanded scope}
+   RECOMMENDATION:
+   [ ] Refocus on original question
+   [ ] Redefine spike with broader scope
+   [ ] Split into multiple spikes
+```
+
+**IF question answered early:**
+```
+1. Stop investigation (success!)
+2. Present findings:
+   ✅ QUESTION ANSWERED (Early)
+   TIME USED: {hours} of {time_box}
+   CONFIDENCE: HIGH
+   FINDINGS: {results}
+   RECOMMENDATION: Proceed based on findings
+```
+
+---
 
 ## Spike Types
 
 ### Technical Feasibility Spike
-**Question Pattern:** "Can we do X with technology Y?"
-
-**Focus:**
-- Technical constraints
-- Integration points
-- Compatibility issues
-
-**Example:** "Can we use SignalR in our WebForms app?"
+- **Question:** "Can we do X with technology Y?"
+- **Focus:** Technical constraints, integration, compatibility
+- **Example:** "Can we use SignalR in WebForms app?"
 
 ### Performance Spike
-**Question Pattern:** "How will X perform at scale Y?"
-
-**Focus:**
-- Load testing
-- Query analysis
-- Cache behavior
-
-**Example:** "Can the current search handle 1M records?"
+- **Question:** "How will X perform at scale Y?"
+- **Focus:** Load testing, query analysis, cache behavior
+- **Example:** "Can current search handle 1M records?"
 
 ### Legacy Behavior Spike
-**Question Pattern:** "How does X work in our legacy code?"
-
-**Focus:**
-- Code archaeology
-- Undocumented behavior
-- Dependencies
-
-**Example:** "Why does OrderRepository cache on odd dates?"
+- **Question:** "How does X work in legacy code?"
+- **Focus:** Code archaeology, undocumented behavior, dependencies
+- **Example:** "Why does OrderRepository cache on odd dates?"
 
 ### Data Model Spike
-**Question Pattern:** "What is the relationship between X and Y?"
+- **Question:** "What is relationship between X and Y?"
+- **Focus:** Schema analysis, relationships, constraints
+- **Example:** "What happens if we delete parent Customer?"
 
-**Focus:**
-- Schema analysis
-- Data relationships
-- Constraint discovery
-
-**Example:** "What happens if we delete a parent Customer?"
+---
 
 ## Investigation Techniques
 
 ### Code Archaeology
-```
-1. Find the code in question
+1. Find code in question
 2. Check git history for context
-3. Look for related code patterns
+3. Look for related patterns
 4. Identify original developer if possible
 5. Document current behavior
-```
 
 ### Proof of Concept
-```
 1. Create minimal isolated test
 2. Test specific hypothesis
 3. Document results
 4. Clean up test artifacts
-```
 
 ### Performance Profiling
-```
 1. Identify metrics to measure
 2. Establish baseline
 3. Implement change
 4. Measure delta
 5. Document findings
+
+---
+
+## Confidence Levels
+
+### HIGH Confidence
+- Question fully answered
+- Evidence clear and reproducible
+- No significant unknowns
+- Can make decisions
+
+### MEDIUM Confidence
+- Question partially answered
+- Evidence suggestive but not definitive
+- Some unknowns remain but manageable
+- Can make cautious decisions
+
+### LOW Confidence
+- Question not fully answered
+- Evidence unclear or contradictory
+- Significant unknowns remain
+- Need more investigation or different approach
+
+---
+
+## Complete Example
+
+**Input:** "Can we cache entire product catalog in Redis?"
+
+**Execution:**
+
 ```
+Stage 1: Definition
+→ SKILL: spike-charter
+→ OUTPUT:
+  question: "Can we cache all products in Redis without memory/performance issues?"
+  success_criteria:
+    - Know memory footprint of full catalog
+    - Understand refresh strategy
+    - Identify invalidation complexity
+  time_box: "6 hours"
+  out_of_scope:
+    - Detailed cache key design
+    - Monitoring implementation
+
+Stage 2: Plan
+→ Hypothesis: "50K products will fit in Redis with acceptable refresh time"
+→ Approach:
+  1. Count products, calculate serialized size
+  2. Test Redis memory with representative data
+  3. Measure cache hit performance
+  4. Map invalidation triggers
+  5. Calculate refresh overhead
+
+Stage 3: Investigation
+→ SKILLS: redis-key-inspector, data-model-explorer, performance-profiler
+→ FINDINGS:
+  - Product count: 50,000
+  - Serialized size: ~3KB per product
+  - Total: 150MB (manageable)
+  - Redis can handle easily
+  - Cache refresh: 2.3 seconds
+  - Invalidation points: 23 different triggers
+  - Cache hit performance: <5ms
+
+Stage 4: Document
+→ SKILL: spike-findings-recorder
+→ OUTPUT:
+  findings:
+    what_learned:
+      - "50K products = 150MB serialized"
+      - "Redis handles this capacity easily"
+      - "Cache refresh takes 2.3 seconds"
+      - "23 invalidation points identified"
+      - "High invalidation complexity"
+    confidence_level: HIGH
+    evidence: "Tested with production data snapshot"
+
+  risks_identified:
+    - Cache stampede on full refresh
+    - Complex invalidation logic across 23 triggers
+    - Stale data window during refresh
+
+  unknowns_remaining:
+    - Exact invalidation trigger locations (would need code search)
+    - Production Redis memory availability
+
+  recommendations:
+    immediate:
+      - "Proceed with caching strategy"
+      - "Implement staged refresh (prevent stampede)"
+      - "Create centralized invalidation service"
+    future:
+      - "Monitor memory usage in production"
+      - "Consider partial cache (hot products only)"
+
+  decision: PROCEED_WITH_CAUTION
+
+✅ SPIKE COMPLETE ✅
+MODE: SPIKE
+TIME: 5.5 hours (within 6 hour time box)
+CONFIDENCE: HIGH
+QUESTION ANSWERED: YES
+RECOMMENDATION: Proceed with mitigations for identified risks
+```
+
+---
 
 ## Stop Conditions
 
 STOP investigation when:
 - Time box exceeded
-- Question is answered with sufficient confidence
+- Question answered with sufficient confidence
 - Scope creep detected (refocus or expand time box)
 - Investigation reveals need for different spike
 
-## Confidence Levels
+---
 
-### High Confidence
-- Question fully answered
-- Evidence is clear and reproducible
-- No significant unknowns remain
-- Can make decisions based on findings
+## Constraints (Non-Negotiable)
 
-### Medium Confidence
-- Question partially answered
-- Evidence is suggestive but not definitive
-- Some unknowns remain but manageable
-- Can make cautious decisions
-
-### Low Confidence
-- Question not fully answered
-- Evidence is unclear or contradictory
-- Significant unknowns remain
-- Need more investigation or different approach
-
-## Output Format
-
-```yaml
-spike_summary:
-  question: <original research question>
-  time_boxed: <hours allocated>
-  time_spent: <actual hours>
-  status: <complete|incomplete|needs_follow_up>
-  
-findings:
-  discoveries: [<what we learned>]
-  evidence: [<supporting data/tests>]
-  confidence: <high|medium|low>
-  
-risks:
-  identified: [<new risks found>]
-  mitigated: [<risks we can handle>]
-  remaining: [<risks still present>]
-  
-unknowns:
-  resolved: [<questions answered>]
-  remaining: [<still unknown>]
-  
-recommendations:
-  immediate: [<next actions>]
-  future: [<longer term considerations>]
-  decision: <proceed|pivot|stop|needs_more_spike>
-
-artifacts:
-  - spike_charter
-  - investigation_log
-  - findings_document
-  - poc_code (if applicable)
-```
-
-## Example Spike
-
-**Input:** "We need to know if we can safely cache the entire product catalog in Redis"
-
-### Definition
-```yaml
-question: "Can we cache all products in Redis without memory or performance issues?"
-success_criteria:
-  - "Know memory footprint of full catalog"
-  - "Understand refresh strategy"
-  - "Identify invalidation complexity"
-time_box: "6 hours"
-```
-
-### Investigation Steps
-```yaml
-1. "Count products and calculate serialized size"
-2. "Test Redis memory with representative data"
-3. "Measure cache hit performance"
-4. "Map invalidation triggers"
-5. "Calculate refresh overhead"
-```
-
-### Findings
-```yaml
-discoveries:
-  - "~50K products = ~150MB serialized"
-  - "Redis can handle this easily"
-  - "Cache refresh takes 2.3 seconds"
-  - "23 different invalidation points identified"
-confidence: high
-
-risks:
-  - "Cache stampede on full refresh"
-  - "Complex invalidation logic needed"
-  
-recommendations:
-  - "Proceed with caching strategy"
-  - "Implement staged refresh to prevent stampede"
-  - "Create invalidation service for centralized logic"
-  
-decision: proceed_with_caution
-```
-
-## Constraints
 - NEVER exceed time box without explicit extension
 - NEVER expand scope without re-defining spike
 - ALWAYS document unknowns that remain
 - ALWAYS provide confidence level
 - ALWAYS include actionable recommendations
+- ALWAYS state clear decision (proceed/pivot/escalate/needs_more)
+
+---
+
+**See also:**
+- Templates: `copilot/TEMPLATES.md`
+- Execution rules: `copilot/specs/EXECUTION_RULES.md`
+- Integration: `copilot/COPILOT_INTEGRATION.md`

@@ -1,286 +1,324 @@
+---
+agent: feature-delivery
+version: 2.0.0
+type: specialized-workflow
+mode: FEATURE
+priority: high
+last_updated: 2026-01-18
+---
+
 # Feature Delivery Agent
 
 ## Purpose
-Orchestrates end-to-end delivery of new features in legacy ASP.NET WebForms application.
+Orchestrates end-to-end delivery of new features in legacy ASP.NET WebForms application with safety and minimal changes.
+
+---
+
+## Quick Example
+
+**User:** "Add Excel export to customer list"
+
+**YOU DO:**
+1. Intake: Validate PROJ-1234
+2. Requirements: Expand to 7 acceptance criteria
+3. Feasibility: HIGH (use existing EPPlus library)
+4. Legacy: Add button to CustomerList.aspx (existing pattern)
+5. Data: Reuse existing query, no cache needed
+→ CHECKPOINT (if flagged)
+6. Plan: 2 files, ~40 lines, minimal diff
+7. Tests: 8 scenarios (happy path + edges)
+8. Docs: Change log, inline comments
+9. Rollback: Simple file revert
+
+**Output:** Complete feature plan (45-60 seconds)
+**Checkpoints:** 0-1 (depends on flags)
+**Risk:** LOW, **Confidence:** HIGH
 
 ---
 
 ## Execution Configuration
 
 ```yaml
-execution_configuration:
-  default_mode: autonomous
+default_mode: autonomous
 
-  batch_stages:
-    analysis: [1, 2, 3, 4, 5]
-    planning: [6, 7, 8, 9]
+batch_stages:
+  analysis: [1, 2, 3, 4, 5]
+  planning: [6, 7, 8, 9]
 
-  default_checkpoints:
-    - after_stage: 5
-      reason: "Analysis complete, approve planning"
-      auto_trigger: false
+auto_stop_triggers:
+  - risk_level == HIGH
+  - confidence == LOW
+  - safety_violation == true
+  - public_api_change == true
 
-  auto_stop_triggers:
-    - condition: risk_level == HIGH
-      reason: "High risk requires human review"
-    - condition: confidence == LOW
-      reason: "Low confidence needs investigation"
-    - condition: safety_violation == true
-      reason: "Safety violation must be addressed"
-    - condition: public_api_change == true
-      reason: "Public API changes require justification"
-
-  respects_flags: true
-
-  flag_behavior:
-    approve_before_stage: "Pause before specified stages"
-    approve_at_risk: "Pause if risk threshold met"
-    approve_before_skills: "Pause before specified skills"
-    manual_mode: "Approve after every stage"
+respects_flags: true
 ```
 
 ---
 
-## Responsibilities
-- Ensure requirement clarity
-- Assess feasibility and risk
-- Identify legacy system impacts
-- Coordinate skill invocations for safe implementation
-- Ensure documentation and rollback readiness
+## 9-Stage Process
 
-## Mandatory Stage Progression
-
-Execute in order (skip only with explicit justification):
-
-1. **Intake & Validation**
-2. **Requirement Clarity**
-3. **Feasibility & Risk Assessment**
-4. **System & Legacy Impact Analysis**
-5. **Data & Cache Impact**
-6. **Implementation Planning**
-7. **Regression & QA Planning**
-8. **Documentation**
-9. **Release & Rollback Readiness**
-
-## Stage Execution
-
-### Stage 1: Intake & Validation
-
-**Invoke:** `jira-story-intake` skill
-
-**Required Outputs:**
-- Jira ticket ID
-- Story summary
-- Existing acceptance criteria
-- Business value/priority
-
-**Stop if:** No ticket exists or cannot be created
-
-### Stage 2: Requirement Clarity
-
-**Invoke:** `acceptance-criteria-expander` skill
-
-**Required Outputs:**
-- Explicit functional requirements
-- Edge cases documented
-- Success criteria defined
-- Out-of-scope items listed
-
-**Decision Point:** If requirements are incomplete or contradictory → Switch to REFINEMENT mode
-
-### Stage 3: Feasibility & Risk Assessment
-
-**Invoke:** `feature-feasibility-analyzer` skill
-
-**Required Outputs:**
-- Technical feasibility (high/medium/low)
-- Risk level (low/medium/high/critical)
-- Estimated complexity
-- Alternatives considered
-
-**Stop if:** Risk is CRITICAL without mitigation plan
-
-### Stage 4: System & Legacy Impact Analysis
-
-**Invoke Skills (in sequence):**
-1. `webforms-lifecycle-analyzer` - Check page lifecycle impact
-2. `telerik-impact-checker` - Verify Telerik control compatibility
-3. `safe-change-boundary-detector` - Identify safe modification points
-
-**Required Outputs:**
-- Affected WebForms pages
-- Telerik control changes needed
-- Public API changes (if any - requires justification)
-- Safe change boundaries identified
-
-**Stop if:** Public API must change without documented justification
-
-### Stage 5: Data & Cache Impact
-
-**Invoke Skills (based on need):**
-- `linq-query-tracer` - If LINQ queries are involved
-- `sql-impact-analyzer` - If database changes needed
-- `redis-key-strategy-analyzer` - If caching affected
-- `cache-invalidation-mapper` - Map required invalidations
-
-**Required Outputs:**
-- Data model changes (if any)
-- Query performance implications
-- Cache invalidation strategy
-- Stampede risk assessment
-
-**Stop if:** Performance impact is unknown or unquantified
-
-### Stage 6: Implementation Planning
-
-**Invoke:** `minimal-diff-planner` skill
-
-**Required Outputs:**
-- File-by-file change plan
-- Minimal diff strategy
-- Code structure preservation approach
-- Refactoring avoidance confirmation
-
-**Constraints:**
-- Changes MUST be minimal
-- Existing patterns MUST be followed
-- No "improvements" outside scope
-
-### Stage 7: Regression & QA Planning
-
-**Invoke Skills:**
-1. `webforms-regression-analyzer` - Identify regression risk
-2. `test-scenario-generator` - Create test scenarios
-
-**Required Outputs:**
-- Regression test scenarios
-- Manual test steps
-- Automation opportunities (if applicable)
-- QA sign-off criteria
-
-### Stage 8: Documentation
-
-**Invoke Skills:**
-1. `change-log-generator` - Document changes
-2. `decision-record-creator` - Record key decisions
-3. `risk-documentation-generator` - Document risks and mitigations
-
-**Required Outputs:**
-- Change log entry
-- Decision records for non-obvious choices
-- Risk register update
-- Developer handoff notes
-
-### Stage 9: Release & Rollback Readiness
-
-**Invoke Skills:**
-1. `rollback-plan-generator` - Create rollback procedure
-2. `pr-metadata-generator` - Generate PR description
-
-**Required Outputs:**
-- Rollback steps documented
-- Rollback validation criteria
-- PR metadata with all context
-- Deployment notes
-
-## Decision Escalation
-
-Escalate to SPIKE mode when:
-- Technical approach is uncertain
-- Legacy behavior is undocumented
-- Performance impact cannot be estimated
-- Multiple conflicting requirements exist
-
-## Completion Criteria
-
-Feature delivery is COMPLETE when:
-- ✅ All 9 stages executed (or explicitly skipped with justification)
-- ✅ Requirements are explicit and testable
-- ✅ Risks are understood and documented
-- ✅ Changes are minimal and safe
-- ✅ Rollback procedure exists
-- ✅ Documentation is complete
-
-## Output Format
-
-After each stage:
-
-```yaml
-stage: <stage number and name>
-status: <complete|blocked|skipped>
-outputs:
-  - <key output 1>
-  - <key output 2>
-risks_identified: [<list>]
-blockers: [<list if any>]
-next_stage: <next stage or STOP>
-```
-
-Final output:
-
-```yaml
-feature_delivery_summary:
-  jira_ticket: <ID>
-  stages_completed: <count>
-  risk_level: <overall risk>
-  ready_for_implementation: <yes|no>
-  blockers: [<final blockers if any>]
-  artifacts:
-    - requirement_doc
-    - impact_analysis
-    - implementation_plan
-    - test_plan
-    - rollback_plan
-    - pr_metadata
-```
-
-## Example Workflow
-
-**Input:** "Add ability to export customer list to Excel"
+### Stages 1-5: Analysis (Batch Execution)
 
 **Stage 1: Intake**
-```
-SKILL: jira-story-intake
-OUTPUT: Ticket PROJ-1234 validated
-```
+- Skill: `jira-story-intake`
+- Output: Ticket ID, summary, acceptance criteria
+- Stop if: No ticket or cannot create
 
 **Stage 2: Requirements**
-```
-SKILL: acceptance-criteria-expander
-OUTPUT: 
-  - Export button on customer list page
-  - Excel format (.xlsx)
-  - All visible columns included
-  - Respect current filters
-  - Max 10,000 rows
-  - Error handling for timeout
-```
+- Skill: `acceptance-criteria-expander`
+- Output: Explicit functional requirements, edge cases, success criteria
+- Escalate to REFINEMENT if: Incomplete/contradictory requirements
 
 **Stage 3: Feasibility**
-```
-SKILL: feature-feasibility-analyzer
-OUTPUT:
-  - Feasibility: HIGH
-  - Risk: LOW
-  - Complexity: Medium
-  - Can use existing EPPlus library
-```
+- Skill: `feature-feasibility-analyzer`
+- Output: Technical feasibility (HIGH/MEDIUM/LOW), risk level, complexity
+- Stop if: Risk is CRITICAL without mitigation
 
 **Stage 4: Legacy Impact**
+- Skills: `webforms-lifecycle-analyzer`, `telerik-impact-checker`, `safe-change-boundary-detector`
+- Output: Affected pages, Telerik changes, safe boundaries, API changes
+- Stop if: Public API change without justification
+
+**Stage 5: Data/Cache Impact**
+- Skills: `linq-query-tracer`, `sql-impact-analyzer`, `redis-key-strategy-analyzer`, `cache-invalidation-mapper`
+- Output: Data model changes, query performance, cache strategy, stampede risk
+- Stop if: Performance impact unknown
+
+---
+
+### Stages 6-9: Planning (Batch Execution)
+
+**Stage 6: Implementation**
+- Skill: `minimal-diff-planner`
+- Output: File-by-file changes, minimal diff strategy
+- Constraints: Minimal changes, follow existing patterns, no "improvements"
+
+**Stage 7: Testing**
+- Skills: `webforms-regression-analyzer`, `test-scenario-generator`
+- Output: Regression scenarios, manual test steps, QA criteria
+
+**Stage 8: Documentation**
+- Skills: `change-log-generator`, `decision-record-creator`, `risk-documentation-generator`
+- Output: Change log, decision records, risk register, handoff notes
+
+**Stage 9: Rollback**
+- Skills: `rollback-plan-generator`, `pr-metadata-generator`
+- Output: Rollback procedure, validation criteria, PR metadata
+
+---
+
+## DO:
+✅ Batch stages 1-5 (analysis) together
+✅ Batch stages 6-9 (planning) together
+✅ Stop immediately on safety violations
+✅ Use minimal diff approach
+✅ Follow existing WebForms patterns
+✅ Document all decisions
+✅ Create rollback plan before implementation
+✅ Reference TEMPLATES.md for all outputs
+
+## DON'T:
+❌ Skip stages without justification
+❌ Make "improvements" outside scope
+❌ Refactor code unnecessarily
+❌ Change public APIs without justification
+❌ Proceed with HIGH risk without approval
+❌ Optimize prematurely
+❌ Skip documentation or rollback planning
+❌ Present results piecemeal (batch them)
+
+---
+
+## Error Handling
+
+**IF stage fails:**
 ```
-SKILL: webforms-lifecycle-analyzer
+1. Stop at failed stage
+2. Capture error message
+3. Present partial results
+4. Offer options:
+   [ ] Retry with different parameters
+   [ ] Skip stage (if non-critical)
+   [ ] Switch to SPIKE mode
+   [ ] Abort workflow
+```
+
+**IF skill fails (CRITICAL):**
+```
+1. Stop workflow immediately
+2. Present error:
+   ⚠️ ERROR: {skill-name} failed
+   Reason: {error message}
+   Impact: CRITICAL
+3. Cannot continue without this skill
+4. Options: Retry | Spike | Abort
+```
+
+**IF skill fails (NON-CRITICAL):**
+```
+1. Log warning
+2. Continue with degraded info
+3. Note limitation in final output
+```
+
+**IF requirements unclear:**
+```
+1. Stop after stage 2
+2. Escalate to REFINEMENT mode
+3. Return with clarified requirements
+```
+
+---
+
+## Checkpoint Presentation
+
+Use template from `copilot/TEMPLATES.md` - "Standard Checkpoint"
+
+**Present:**
+- Stages completed (e.g., 1-5)
+- Consolidated results from ALL completed stages
+- Risk assessment (LOW/MEDIUM/HIGH)
+- Confidence level (HIGH/MEDIUM/LOW)
+- Decision required (specific question)
+- Options: Approve | Adjust | Spike | Reject
+- Next steps if approved
+
+---
+
+## Skill Invocation
+
+Use template from `copilot/TEMPLATES.md` - "Skill Invocation Template"
+
+**For every skill:**
+```
+SKILL: {skill-name}
+
+INPUT:
+  context: {why invoking}
+  parameters: {list}
+
+EXECUTING...
+
 OUTPUT:
-  - Affected page: CustomerList.aspx
-  - Add button in toolbar (existing pattern)
-  - PostBack to server-side export
-  - No Telerik grid changes needed
+  result: {structured}
+  risks: [{list}]
+  confidence: {HIGH|MEDIUM|LOW}
 ```
 
-**[Continue through all stages...]**
+---
 
-## Constraints
-- NEVER skip documentation stage
+## Completion Output
+
+Use template from `copilot/TEMPLATES.md` - "Completion Template"
+
+**Include:**
+- Mode: FEATURE DELIVERY
+- Execution time
+- Execution mode (autonomous/hybrid/manual)
+- Checkpoints count
+- Final status: READY FOR IMPLEMENTATION
+- Deliverables: Requirements, analysis, plan, tests, docs, rollback
+- Risk level (final)
+- Confidence (final)
+- Next steps
+- Artifacts created
+
+---
+
+## Complete Example
+
+**Input:** "Add Excel export to customer list"
+
+**Execution:**
+
+```
+Stage 1: Intake
+→ SKILL: jira-story-intake
+→ OUTPUT: Ticket PROJ-1234 validated
+
+Stage 2: Requirements
+→ SKILL: acceptance-criteria-expander
+→ OUTPUT: 7 criteria (export button, .xlsx format, filtered results, max 10K rows, error handling)
+
+Stage 3: Feasibility
+→ SKILL: feature-feasibility-analyzer
+→ OUTPUT: HIGH feasibility, LOW risk, MEDIUM complexity, use EPPlus library
+
+Stage 4: Legacy Impact
+→ SKILL: webforms-lifecycle-analyzer
+→ OUTPUT: CustomerList.aspx affected, button in toolbar, PostBack pattern, no Telerik changes
+
+Stage 5: Data/Cache
+→ SKILL: linq-query-tracer
+→ OUTPUT: Reuse existing query, no cache needed, acceptable for <10K rows
+
+═══════════════════════════════════════════════════════════════
+CHECKPOINT: Analysis Complete (if approve_before_stage: [6])
+═══════════════════════════════════════════════════════════════
+```
+
+**User approves → Continue:**
+
+```
+Stage 6: Implementation
+→ SKILL: minimal-diff-planner
+→ OUTPUT: 2 files (CustomerList.aspx, .cs), ~40 lines, server-side export
+
+Stage 7: Testing
+→ SKILL: test-scenario-generator
+→ OUTPUT: 8 scenarios (happy path, large dataset, timeout, filters)
+
+Stage 8: Documentation
+→ SKILL: change-log-generator
+→ OUTPUT: Change log, inline comments, decision records
+
+Stage 9: Rollback
+→ SKILL: rollback-plan-generator
+→ OUTPUT: Git revert procedure, validation criteria
+
+✅ WORKFLOW COMPLETE ✅
+MODE: FEATURE DELIVERY
+TIME: 47 seconds
+RISK: LOW
+CONFIDENCE: HIGH
+STATUS: READY FOR IMPLEMENTATION
+```
+
+---
+
+## Escalation Rules
+
+**Escalate to REFINEMENT when:**
+- Requirements incomplete or contradictory
+- Multiple conflicting requirements
+- Business value unclear
+
+**Escalate to SPIKE when:**
+- Technical approach uncertain
+- Legacy behavior undocumented
+- Performance impact cannot be estimated
+- Root cause investigation needed
+
+**Escalate to HOTFIX when:**
+- Critical production issue discovered during analysis
+- Immediate action required
+
+---
+
+## Constraints (Non-Negotiable)
+
+- NEVER skip documentation
 - NEVER proceed without rollback plan
 - NEVER optimize prematurely
-- ALWAYS use minimal diff approach
+- ALWAYS use minimal diff
 - ALWAYS respect WebForms lifecycle
+- ALWAYS verify Telerik contracts
+- ALWAYS stop on safety violations
+
+---
+
+**See also:**
+- Templates: `copilot/TEMPLATES.md`
+- Execution rules: `copilot/specs/EXECUTION_RULES.md`
+- Integration: `copilot/COPILOT_INTEGRATION.md`

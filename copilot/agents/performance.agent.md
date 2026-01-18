@@ -1,412 +1,346 @@
+---
+agent: performance
+version: 2.0.0
+type: specialized-workflow
+mode: PERFORMANCE
+priority: high
+last_updated: 2026-01-18
+---
+
 # Performance Agent
 
 ## Purpose
-Orchestrates investigation and optimization of performance issues in legacy ASP.NET WebForms application.
+Orchestrates investigation and optimization of performance issues with measurable improvements and safety verification.
+
+---
+
+## Quick Example
+
+**User:** "Customer search is slow - takes 8+ seconds"
+
+**YOU DO:**
+1. Baseline: 8200ms page load, 7800ms query time, 0% cache hit
+2. Bottleneck: CustomerRepository loading 4500 rows, filtering in memory
+3. Root Cause: SELECT * + Where after ToList() + missing index
+→ CHECKPOINT (if flagged)
+4. Strategy: Push filter to DB + add index + pagination (95% reduction expected)
+5. Safety: No data correctness impact, backwards compatible
+6. Plan: Move Where(), add index on Status, implement pagination
+7. Validation: Measure <400ms target, load test with 50K records
+
+**Output:** Complete optimization plan
+**Expected:** 8200ms → 400ms (95% improvement)
+**Risk:** LOW, **Confidence:** HIGH
 
 ---
 
 ## Execution Configuration
 
 ```yaml
-execution_configuration:
-  default_mode: autonomous
+default_mode: autonomous
 
-  batch_stages:
-    analysis: [1, 2, 3]
-    planning: [4, 5, 6, 7]
+batch_stages:
+  analysis: [1, 2, 3]
+  planning: [4, 5, 6, 7]
 
-  default_checkpoints:
-    - after_stage: 3
-      reason: "Root cause analysis complete, approve optimization strategy"
-      auto_trigger: false
+auto_stop_triggers:
+  - baseline_not_measurable == true → Cannot optimize without baseline
+  - data_correctness_at_risk == true → STOP immediately
+  - optimization_impact == UNKNOWN → Need quantifiable expectation
+  - risk_level == HIGH → Requires review
 
-  auto_stop_triggers:
-    - condition: baseline_not_measurable == true
-      reason: "Cannot optimize without measurable baseline"
-    - condition: data_correctness_at_risk == true
-      reason: "Performance optimization risks data correctness"
-    - condition: optimization_impact == UNKNOWN
-      reason: "Cannot quantify expected improvement"
-    - condition: risk_level == HIGH
-      reason: "High risk optimization requires review"
-
-  respects_flags: true
-
-  flag_behavior:
-    approve_before_stage: "Pause before specified stages"
-    approve_at_risk: "Pause if risk threshold met"
-    approve_before_skills: "Pause before specified skills"
-    manual_mode: "Approve after every stage"
+respects_flags: true
 ```
 
 ---
 
-## Responsibilities
-- Diagnose performance bottlenecks
-- Analyze data access patterns
-- Optimize queries and caching
-- Ensure safe performance improvements
-- Quantify performance impact
+## 7-Stage Process
 
-## Mandatory Stages
+### Stages 1-3: Analysis (Batch Execution)
 
-1. **Performance Baseline**
-2. **Bottleneck Identification**
-3. **Root Cause Analysis**
-4. **Optimization Strategy**
-5. **Safety & Impact Verification**
-6. **Implementation Planning**
-7. **Measurement & Validation**
+**Stage 1: Baseline**
+- Skill: `performance-profiler`
+- Metrics: Page load time, query time, cache hit rate, memory, P50/P95/P99
+- Requirement: Baseline must be measurable and reproducible
 
-## Stage Execution
+**Stage 2: Bottleneck ID**
+- Skills: `request-profiler`, `sql-execution-analyzer`, `cache-miss-detector`, `network-latency-checker`
+- Output: Component, time consumed (ms or %), frequency, severity
+- Prioritize: Highest (time × frequency)
 
-### Stage 1: Performance Baseline
+**Stage 3: Root Cause**
+- Database: `linq-query-tracer`, `sql-execution-plan-analyzer`, `missing-index-detector`, `n-plus-one-detector`
+- Cache: `redis-key-strategy-analyzer`, `cache-stampede-detector`, `cache-invalidation-analyzer`
+- Code: `webforms-viewstate-analyzer`, `serialization-overhead-checker`, `loop-optimization-scanner`
+- Output: Specific issue, evidence, quantified impact, fix complexity
 
-**Invoke:** `performance-profiler` skill
+---
 
-**Required Outputs:**
-```yaml
-baseline:
-  page_load_time: <current time in ms>
-  query_execution_time: <time per query>
-  cache_hit_rate: <percentage>
-  memory_usage: <MB>
-  concurrent_users: <load level>
-  percentiles:
-    p50: <median time>
-    p95: <95th percentile>
-    p99: <99th percentile>
+### Stages 4-7: Planning (Batch Execution)
+
+**Stage 4: Strategy**
+- Skill: `optimization-strategy-planner`
+- Types: Query optimization (index/rewrite/caching), Caching strategy (redis/memory/output), Data access pattern (eager loading/batching/pagination)
+- Output: Approach, expected improvement (% or ms), risk, complexity
+
+**Stage 5: Safety**
+- Skills: `safe-change-boundary-detector`, `query-behavior-validator`, `cache-correctness-validator`, `performance-regression-checker`
+- Output: Data correctness (verified/at_risk/unknown), backwards compatibility, cache consistency, rollback safety
+- Stop if: Data correctness at_risk or unknown
+
+**Stage 6: Implementation**
+- Skill: `performance-implementation-planner`
+- Output: File changes, phased approach (low risk first), testing requirements
+- Phases: Phase 1 (low risk, quick wins), Phase 2 (higher risk, bigger gains)
+
+**Stage 7: Validation**
+- Skill: `performance-validation-planner`
+- Output: Metrics to track (baseline/target/acceptable), load scenarios (typical/peak), success criteria
+- Requirement: Must have measurable success criteria
+
+---
+
+## DO:
+✅ Measure baseline before optimizing
+✅ Quantify expected improvement
+✅ Verify data correctness after optimization
+✅ Use phased approach (low risk first)
+✅ Test with realistic load
+✅ Have rollback plan ready
+✅ Reference TEMPLATES.md for all outputs
+
+## DON'T:
+❌ Optimize without measurable baseline
+❌ Sacrifice correctness for performance
+❌ Skip safety verification
+❌ Proceed with unknown impact
+❌ Skip load testing
+❌ Make changes without rollback plan
+❌ Present results piecemeal (batch them)
+
+---
+
+## Error Handling
+
+**IF baseline not measurable:**
+```
+1. Stop at stage 1
+2. Present error:
+   ⚠️ CANNOT OPTIMIZE WITHOUT BASELINE
+   REASON: Performance metrics are not measurable
+   REQUIRED: Establish monitoring/profiling first
+   OPTIONS:
+   [ ] Set up profiling tools
+   [ ] Define measurable metrics
+   [ ] Spike investigation: How to measure?
 ```
 
-**Acceptance:** Baseline must be measurable and reproducible
-
-### Stage 2: Bottleneck Identification
-
-**Invoke Skills (in order):**
-1. `request-profiler` - Identify slow operations
-2. `sql-execution-analyzer` - Find slow queries
-3. `cache-miss-detector` - Identify cache issues
-4. `network-latency-checker` - Check external calls
-
-**Required Outputs:**
-```yaml
-bottlenecks:
-  - component: <name>
-    time_consumed: <ms or %>
-    frequency: <how often hit>
-    severity: <critical|high|medium|low>
+**IF data correctness at risk:**
+```
+1. Stop at stage 5 (safety)
+2. CRITICAL STOP:
+   🛑 DATA CORRECTNESS AT RISK
+   OPTIMIZATION: {description}
+   RISK: Optimization may produce incorrect results
+   CANNOT PROCEED
+   OPTIONS:
+   [ ] Find alternative optimization
+   [ ] Add correctness validation layer
+   [ ] Abort optimization
 ```
 
-**Prioritize:** Focus on highest time × frequency
-
-### Stage 3: Root Cause Analysis
-
-**Invoke Skills Based on Bottleneck Type:**
-
-**Database Performance:**
-- `linq-query-tracer` - Analyze LINQ translation
-- `sql-execution-plan-analyzer` - Review execution plans
-- `missing-index-detector` - Find index opportunities
-- `n-plus-one-detector` - Identify query multiplication
-
-**Cache Performance:**
-- `redis-key-strategy-analyzer` - Review cache design
-- `cache-stampede-detector` - Find stampede risks
-- `cache-invalidation-analyzer` - Check invalidation patterns
-
-**Code Performance:**
-- `webforms-viewstate-analyzer` - Check ViewState size
-- `serialization-overhead-checker` - Find serialization costs
-- `loop-optimization-scanner` - Identify inefficient loops
-
-**Required Outputs:**
-```yaml
-root_causes:
-  - cause: <specific issue>
-    evidence: <measurement or observation>
-    impact: <quantified impact>
-    fix_complexity: <low|medium|high>
+**IF impact unknown:**
+```
+1. Stop at stage 4 (strategy)
+2. Present issue:
+   ⚠️ CANNOT QUANTIFY IMPROVEMENT
+   REASON: Expected improvement is unknown
+   REQUIRED: Must estimate impact before proceeding
+   OPTIONS:
+   [ ] Run spike to measure expected gain
+   [ ] Find alternative with known impact
+   [ ] Proceed with LOW confidence (not recommended)
 ```
 
-### Stage 4: Optimization Strategy
+---
 
-**Invoke:** `optimization-strategy-planner` skill
+## Common Patterns
 
-**Strategy Types:**
-
-**Query Optimization:**
-```yaml
-type: query_optimization
-approach: <index|rewrite|stored_procedure|caching>
-expected_improvement: <percentage or ms>
-risk: <low|medium|high>
-complexity: <low|medium|high>
-```
-
-**Caching Strategy:**
-```yaml
-type: caching
-cache_layer: <redis|memory|output>
-key_strategy: <pattern>
-ttl: <duration>
-invalidation: <pattern>
-stampede_prevention: <yes|no>
-```
-
-**Data Access Pattern:**
-```yaml
-type: data_access
-pattern: <eager_loading|batching|pagination>
-affected_queries: [<list>]
-expected_improvement: <percentage>
-```
-
-### Stage 5: Safety & Impact Verification
-
-**Invoke Skills:**
-1. `safe-change-boundary-detector` - Verify safe modification
-2. `query-behavior-validator` - Ensure query correctness
-3. `cache-correctness-validator` - Verify cache consistency
-4. `performance-regression-checker` - Check for regressions
-
-**Required Outputs:**
-```yaml
-safety_check:
-  data_correctness: <verified|at_risk|unknown>
-  backwards_compatibility: <maintained|breaking|unknown>
-  cache_consistency: <guaranteed|eventual|at_risk>
-  rollback_safe: <yes|no>
-```
-
-**Stop if:** Data correctness is at_risk or unknown
-
-### Stage 6: Implementation Planning
-
-**Invoke:** `performance-implementation-planner` skill
-
-**Required Outputs:**
-```yaml
-implementation:
-  changes:
-    - file: <path>
-      type: <index|query|cache|code>
-      description: <what changes>
-  
-  phases:
-    - phase: 1
-      changes: [<low risk changes>]
-      expected_gain: <percentage>
-    - phase: 2
-      changes: [<higher risk changes>]
-      expected_gain: <percentage>
-  
-  testing:
-    - performance_test_scenarios
-    - load_test_requirements
-    - validation_criteria
-```
-
-### Stage 7: Measurement & Validation
-
-**Invoke:** `performance-validation-planner` skill
-
-**Required Outputs:**
-```yaml
-validation:
-  metrics_to_track:
-    - metric: <name>
-      baseline: <value>
-      target: <value>
-      acceptable: <value>
-  
-  load_scenarios:
-    - scenario: <typical load>
-      users: <count>
-      duration: <time>
-    - scenario: <peak load>
-      users: <count>
-      duration: <time>
-  
-  success_criteria:
-    - <must achieve X improvement>
-    - <no regression in Y>
-    - <maintain Z correctness>
-```
-
-## Common Performance Patterns
-
-### Pattern 1: N+1 Query Problem
-
-**Symptoms:**
-- Multiple queries for related data
-- Query count scales with result set
-
-**Detection:**
-```
-SKILL: n-plus-one-detector
-INPUT: Endpoint or page
-OUTPUT: Query multiplication points
-```
-
-**Solution:**
-- Eager loading with Include()
-- Batch queries
-- Caching
+### Pattern 1: N+1 Query
+- **Symptoms:** Multiple queries for related data, scales with result count
+- **Detection:** `n-plus-one-detector`
+- **Solution:** Eager loading (.Include()), batch queries, or caching
 
 ### Pattern 2: Missing Index
-
-**Symptoms:**
-- Table scans in execution plans
-- Query time scales with table size
-
-**Detection:**
-```
-SKILL: missing-index-detector
-INPUT: Slow query
-OUTPUT: Recommended indexes
-```
-
-**Solution:**
-- Add appropriate indexes
-- Update statistics
-- Consider stored procedures
+- **Symptoms:** Table scans, query time scales with table size
+- **Detection:** `missing-index-detector`
+- **Solution:** Add indexes, update statistics, consider stored procedures
 
 ### Pattern 3: Cache Stampede
-
-**Symptoms:**
-- Periodic performance drops
-- Database load spikes on cache expiry
-
-**Detection:**
-```
-SKILL: cache-stampede-detector
-INPUT: Cache key pattern
-OUTPUT: Stampede risk assessment
-```
-
-**Solution:**
-- Staggered expiration
-- Lock-based refresh
-- Probabilistic early refresh
+- **Symptoms:** Periodic drops, DB spikes on cache expiry
+- **Detection:** `cache-stampede-detector`
+- **Solution:** Staggered expiration, lock-based refresh, probabilistic early refresh
 
 ### Pattern 4: Large ViewState
+- **Symptoms:** Large page size, slow loads, high bandwidth
+- **Detection:** `webforms-viewstate-analyzer`
+- **Solution:** Disable ViewState where not needed, server-side cache, control state only
 
-**Symptoms:**
-- Large page size
-- Slow page loads
-- High bandwidth usage
-
-**Detection:**
-```
-SKILL: webforms-viewstate-analyzer
-INPUT: Page
-OUTPUT: ViewState size and contents
-```
-
-**Solution:**
-- Disable ViewState where not needed
-- Move data to server-side cache
-- Use control state only
+---
 
 ## Optimization Decision Matrix
 
 ```
-Impact  | Risk  | Complexity | Decision
---------|-------|------------|---------------------------
-High    | Low   | Low        | Implement immediately
-High    | Low   | High       | Plan for next sprint
-High    | High  | Low        | Spike first, then implement
-High    | High  | High       | Consider alternatives
-Medium  | Low   | Low        | Include in current work
-Medium  | *     | High       | Defer unless critical
-Low     | *     | *          | Defer indefinitely
+Impact | Risk  | Complexity | Decision
+-------|-------|------------|---------------------------
+HIGH   | LOW   | LOW        | Implement immediately
+HIGH   | LOW   | HIGH       | Plan for next sprint
+HIGH   | HIGH  | LOW        | Spike first, then implement
+HIGH   | HIGH  | HIGH       | Consider alternatives
+MEDIUM | LOW   | LOW        | Include in current work
+MEDIUM | *     | HIGH       | Defer unless critical
+LOW    | *     | *          | Defer indefinitely
 ```
 
-## Output Format
+---
 
-```yaml
-performance_optimization_summary:
-  problem: <description>
-  baseline_metrics:
-    current_performance: <measurements>
-    target_performance: <goals>
-  
-  bottlenecks:
-    - component: <name>
-      impact: <high|medium|low>
-      root_cause: <explanation>
-  
-  optimization_strategy:
-    primary_approach: <description>
-    alternatives_considered: [<list>]
-    expected_improvement: <percentage or ms>
-  
-  implementation:
-    complexity: <low|medium|high>
-    risk: <low|medium|high>
-    phases: [<phased approach>]
-  
-  safety:
-    data_correctness: <verified>
-    backwards_compatible: <yes|no>
-    rollback_ready: <yes|no>
-  
-  validation:
-    metrics: [<what to measure>]
-    success_criteria: [<definitions of success>]
-  
-  artifacts:
-    - baseline_report
-    - bottleneck_analysis
-    - optimization_plan
-    - validation_plan
+## Checkpoint Presentation
+
+Use template from `copilot/TEMPLATES.md` - "Standard Checkpoint"
+
+**Present after stages 1-3 (if flagged):**
+- Stages completed: 1 (Baseline), 2 (Bottleneck), 3 (Root Cause)
+- Consolidated results: Current metrics, bottleneck identified, root cause analysis
+- Expected improvement estimate
+- Risk assessment
+- Options: Approve optimization planning | Adjust approach | Spike | Reject
+
+---
+
+## Complete Example
+
+**Input:** "Customer search is slow"
+
+**Execution:**
+
+```
+Stage 1: Baseline
+→ SKILL: performance-profiler
+→ OUTPUT:
+  page_load: 8200ms
+  query_time: 7800ms
+  cache_hit_rate: 0%
+  result_count: 4500 rows
+  p95: 9500ms
+
+Stage 2: Bottleneck
+→ SKILL: request-profiler
+→ OUTPUT:
+  component: "CustomerRepository.GetByFilter()"
+  time_consumed: 95% (7800ms)
+  frequency: Every search
+  severity: CRITICAL
+
+Stage 3: Root Cause
+→ SKILL: linq-query-tracer
+→ OUTPUT:
+  root_cause: "SELECT * then filter in memory"
+  query: "SELECT * FROM Customers; .Where(Status == 'Active') after .ToList()"
+  evidence: "Loading 4500 rows, filtering to 1200"
+  missing_index: "Status column not indexed"
+  impact: "7800ms for query alone"
+
+═══════════════════════════════════════════════════════════════
+CHECKPOINT: Analysis Complete (if approve_before_stage: [4])
+═══════════════════════════════════════════════════════════════
 ```
 
-## Constraints
+**User approves → Continue:**
+
+```
+Stage 4: Strategy
+→ SKILL: optimization-strategy-planner
+→ OUTPUT:
+  approach: "Push filter to DB + add index + pagination"
+  changes:
+    1. Move .Where() before .ToList()
+    2. Add index on Status column
+    3. Implement pagination (50 rows/page)
+  expected: "8200ms → 400ms (95% reduction)"
+  risk: LOW
+  complexity: MEDIUM
+
+Stage 5: Safety
+→ SKILLS: query-behavior-validator, safe-change-boundary-detector
+→ OUTPUT:
+  data_correctness: VERIFIED (same results, filtered at DB)
+  backwards_compatible: YES
+  cache_consistency: N/A (no cache currently)
+  rollback_safe: YES
+
+Stage 6: Implementation
+→ SKILL: performance-implementation-planner
+→ OUTPUT:
+  Phase 1 (Quick win):
+    - Move .Where() before .ToList() (2 line change)
+    - Expected: 8200ms → 2000ms
+  Phase 2 (Bigger gain):
+    - Add index on Status column
+    - Implement pagination
+    - Expected: 2000ms → 400ms
+
+Stage 7: Validation
+→ SKILL: performance-validation-planner
+→ OUTPUT:
+  metrics:
+    - page_load: baseline 8200ms, target <400ms, acceptable <1000ms
+    - query_time: baseline 7800ms, target <200ms
+  load_scenarios:
+    - Typical: 10 concurrent users, 50K customers
+    - Peak: 50 concurrent users, 50K customers
+  success_criteria:
+    - ≥90% improvement from baseline
+    - No regression in data correctness
+    - P95 under 600ms
+
+✅ WORKFLOW COMPLETE ✅
+MODE: PERFORMANCE
+TIME: 52 seconds
+EXPECTED IMPROVEMENT: 95% (8200ms → 400ms)
+RISK: LOW
+CONFIDENCE: HIGH
+STATUS: READY FOR IMPLEMENTATION
+```
+
+---
+
+## Escalation Rules
+
+**Escalate to SPIKE when:**
+- Baseline cannot be established (need investigation)
+- Root cause unclear despite profiling
+- Optimization approach unknown
+- Expected impact cannot be estimated
+
+**Escalate to FEATURE when:**
+- Performance fix requires significant new functionality
+- Optimization reveals architectural changes needed
+
+---
+
+## Constraints (Non-Negotiable)
+
 - NEVER optimize without baseline measurement
 - NEVER sacrifice correctness for performance
 - NEVER skip safety verification
 - ALWAYS quantify expected improvement
 - ALWAYS have rollback plan
 - ALWAYS validate with realistic load
+- ALWAYS stop on data correctness risk
 
-## Example Optimization
+---
 
-**Input:** "Customer search is slow"
-
-**Baseline:**
-```yaml
-current_performance:
-  page_load: 8200ms
-  query_time: 7800ms
-  cache_hit_rate: 0%
-  result_count: 4500 rows
-```
-
-**Bottleneck:**
-```yaml
-primary_bottleneck:
-  component: "CustomerRepository.GetByFilter()"
-  root_cause: "Loading entire result set, then filtering in memory"
-  query: "SELECT * FROM Customers; then .Where(c => c.Status == 'Active')"
-```
-
-**Strategy:**
-```yaml
-optimization:
-  approach: "Push filter to database + add pagination"
-  changes:
-    - "Move Where clause to database query"
-    - "Add index on Status column"
-    - "Implement pagination (50 rows per page)"
-  expected_improvement: "95% reduction (8200ms -> 400ms)"
-```
-
-**Result:**
-```yaml
-measured_improvement:
-  page_load: 420ms
-  query_time: 180ms
-  improvement: 95%
-  success: yes
-```
+**See also:**
+- Templates: `copilot/TEMPLATES.md`
+- Execution rules: `copilot/specs/EXECUTION_RULES.md`
+- Integration: `copilot/COPILOT_INTEGRATION.md`

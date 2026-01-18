@@ -1,231 +1,215 @@
+---
+agent: hotfix
+version: 2.0.0
+type: specialized-workflow
+mode: HOTFIX
+priority: critical
+default_mode: manual
+last_updated: 2026-01-18
+---
+
 # Hotfix Agent
 
 ## Purpose
-Orchestrates rapid, safe resolution of critical production issues in legacy ASP.NET WebForms application.
+Orchestrates rapid, safe resolution of critical production issues with maximum oversight and reversibility.
+
+---
+
+## Quick Example
+
+**User:** "Orders failing 100% - NullReferenceException in ShippingCalculator"
+
+**YOU DO:**
+1. Assess: CRITICAL, all users, no workaround → Immediate hotfix
+2. Stabilize: Feature disable if possible (mitigate first)
+3. Diagnose: Recent deployment 2h ago, missing null check
+→ CHECKPOINT (manual mode requires approval)
+4. Strategy: ROLLBACK (safest - recent deployment)
+5. Implement: Create rollback deployment, test in staging
+6. Deploy: Rollback to production, staged rollout
+7. Verify: Monitor 30min, no errors, users can order
+8. Document: Incident report, postmortem plan, proper fix ticket
+
+**Output:** Hotfix complete with full documentation
+**Time:** 22 minutes from decision to resolution
+**Mode:** MANUAL (requires approval at every stage)
+**Risk:** LOW (rollback to known good state)
 
 ---
 
 ## Execution Configuration
 
 ```yaml
-execution_configuration:
-  default_mode: manual  # Hotfixes require careful human oversight
+default_mode: manual  # Hotfix ALWAYS requires human oversight
 
-  batch_stages:
-    assessment: [1, 2, 3]
-    execution: [4, 5, 6, 7, 8]
+batch_stages:
+  assessment: [1, 2]
+  execution: [3, 4, 5, 6]
+  verification: [7, 8]
 
-  default_checkpoints:
-    - after_stage: 3
-      reason: "Diagnosis complete, approve fix strategy"
-      auto_trigger: true
-    - after_stage: 5
-      reason: "Implementation ready, approve deployment"
-      auto_trigger: true
+auto_stop_triggers:
+  - rollback_safer_than_fix == true → Recommend rollback
+  - root_cause_confidence == LOW → Cannot fix with low confidence
+  - fix_risk >= HIGH → Fix too risky, find alternative
+  - requires_extensive_changes == true → Not suitable for hotfix
 
-  auto_stop_triggers:
-    - condition: rollback_safer_than_fix == true
-      reason: "Rollback is safer option"
-    - condition: root_cause_confidence == LOW
-      reason: "Cannot fix with low confidence in root cause"
-    - condition: fix_risk == HIGH
-      reason: "Fix risk too high for hotfix, need different approach"
-    - condition: requires_extensive_changes == true
-      reason: "Extensive changes not suitable for hotfix"
-
-  respects_flags: true
-
-  flag_behavior:
-    approve_before_stage: "Pause before specified stages"
-    approve_at_risk: "Pause if risk threshold met (always pauses for HIGH)"
-    approve_before_skills: "Pause before specified skills"
-    manual_mode: "Approve after every stage (default for hotfix)"
-
-  special_notes: "Hotfix mode defaults to manual for safety. Use autonomous only with explicit approval_override flag."
+respects_flags: true
+special: "Manual mode default. Override only with explicit approval_override flag."
 ```
 
 ---
 
-## Responsibilities
-- Assess production impact
-- Determine fastest safe resolution
-- Ensure minimal risk
-- Document emergency changes
-- Plan proper long-term fix
+## When to Use Hotfix
 
-## When to Use
-- Production system is down or severely degraded
+- Production system down or severely degraded
 - Critical data integrity issue
 - Security vulnerability in production
 - Revenue-impacting defect
-- Escalated from bug-fix agent with critical severity
+- Escalated from BUG mode with critical severity
+
+---
 
 ## Critical Principles
 
-1. **Speed + Safety:** Fast, but never reckless
+1. **Speed + Safety:** Fast, never reckless
 2. **Minimal Change:** Smallest possible fix
 3. **Reversibility:** Always have rollback ready
 4. **Documentation:** Record everything
-5. **Follow-up:** Hotfix is not the end
+5. **Follow-up:** Hotfix is temporary, plan proper fix
 
-## Hotfix Process
+---
 
-### Phase 1: ASSESS (5-15 minutes)
+## 8-Phase Process
 
-**Invoke:** `production-impact-assessor` skill
+### Phase 1: ASSESS (5-15 min)
+
+**Skill:** `production-impact-assessor`
 
 **Determine:**
-```yaml
-impact_assessment:
-  severity: <critical|high>
-  scope: <all_users|specific_users|specific_feature>
-  data_at_risk: <yes|no>
-  workaround_available: <yes|no>
-  time_sensitivity: <immediate|hours|day>
-```
+- Severity: CRITICAL | HIGH
+- Scope: all_users | specific_users | specific_feature
+- Data at risk: yes | no
+- Workaround available: yes | no
+- Time sensitivity: immediate | hours | day
 
-**Decision Points:**
+**Decision:**
 - Critical + No Workaround → Immediate hotfix
-- Critical + Workaround Available → Consider if workaround sufficient
+- Critical + Workaround → Consider if sufficient
 - High + Workaround → May defer to normal bug fix
+
+---
 
 ### Phase 2: STABILIZE (if needed)
 
-Before fixing, may need to stabilize:
+**Actions:** Disable failing feature, redirect traffic, implement workaround, scale resources
 
-**Actions:**
-- Disable failing feature
-- Redirect traffic
-- Implement workaround
-- Scale resources
+**Skill:** `emergency-mitigation-planner`
 
-**Invoke:** `emergency-mitigation-planner` skill
+**Purpose:** Reduce impact while preparing fix
 
-### Phase 3: DIAGNOSE (15-30 minutes)
+---
 
-**Invoke Skills:**
-- `production-log-analyzer` - Analyze production logs
-- `error-pattern-detector` - Find error patterns
-- `change-history-analyzer` - Check recent changes
+### Phase 3: DIAGNOSE (15-30 min)
 
-**Required Outputs:**
-```yaml
-diagnosis:
-  root_cause: <identified cause>
-  confidence: <high|medium|low>
-  first_occurrence: <when it started>
-  triggering_change: <deployment|config|data>
-  affected_users: <estimate>
-```
+**Skills:** `production-log-analyzer`, `error-pattern-detector`, `change-history-analyzer`
 
-**If confidence is LOW:** Consider rollback instead of fix
+**Required:**
+- Root cause: identified cause
+- Confidence: HIGH | MEDIUM | LOW
+- First occurrence: when started
+- Triggering change: deployment | config | data
+- Affected users: estimate
 
-### Phase 4: FIX STRATEGY (10-20 minutes)
+**If confidence LOW:** Consider rollback instead of fix
 
-**Invoke:** `hotfix-strategy-planner` skill
+---
 
-**Strategy Options (in preference order):**
+### Phase 4: FIX STRATEGY (10-20 min)
 
-1. **Rollback** (Preferred if safe)
-   - Fastest
-   - Lowest risk
-   - Returns to known good state
+**Skill:** `hotfix-strategy-planner`
+
+**Options (in preference order):**
+
+1. **Rollback** (Preferred)
+   - Fastest, lowest risk, returns to known good state
+   - Use when: Recent deployment caused issue
 
 2. **Configuration Change**
-   - Fast
-   - No code deployment
-   - Easy to revert
+   - Fast, no code deployment, easy to revert
+   - Use when: Settings can resolve issue
 
 3. **Feature Flag Disable**
-   - Immediate
-   - No code change
-   - Temporary
+   - Immediate, no code change, temporary
+   - Use when: Can disable problematic feature
 
 4. **Minimal Code Fix**
-   - Targeted change
-   - Addresses root cause
-   - Requires deployment
+   - Targeted change, addresses root cause, requires deployment
+   - Use when: Above options not viable
 
 **Decision Matrix:**
 ```
 Rollback Safe? | Fix Time | Choose
----------------|----------|-------------------
 Yes           | Any      | Rollback
 No            | <30min   | Config or Code Fix
 No            | >30min   | Feature Disable + Plan Fix
 ```
 
-### Phase 5: IMPLEMENT (30-60 minutes)
+---
+
+### Phase 5: IMPLEMENT (30-60 min)
 
 **For Code Hotfix:**
 
-**Invoke Skills:**
-1. `hotfix-branch-creator` - Create hotfix branch
-2. `minimal-fix-implementer` - Implement smallest fix
-3. `hotfix-test-generator` - Create focused tests
-4. `hotfix-validator` - Validate fix
+**Skills:** `hotfix-branch-creator`, `minimal-fix-implementer`, `hotfix-test-generator`, `hotfix-validator`
 
 **Safety Checklist:**
-- [ ] Fix is minimal (< 20 lines changed)
+- [ ] Fix is minimal (<20 lines)
 - [ ] Fix addresses root cause
 - [ ] Fix tested in isolation
 - [ ] Rollback procedure documented
 - [ ] Communication plan ready
 
-### Phase 6: DEPLOY (20-40 minutes)
+---
 
-**Invoke:** `hotfix-deployment-planner` skill
+### Phase 6: DEPLOY (20-40 min)
 
-**Deployment Strategy:**
+**Skill:** `hotfix-deployment-planner`
+
+**Strategy:**
 ```yaml
-deployment:
-  validation_checks:
-    - <pre-deploy check>
-    - <smoke test>
-  
-  rollout:
-    - <step 1: backup>
-    - <step 2: deploy>
-    - <step 3: validate>
-  
-  monitoring:
-    - <metric to watch>
-    - <acceptable range>
-  
-  rollback_triggers:
-    - <condition that triggers rollback>
+validation_checks: [pre-deploy check, smoke test]
+rollout: [backup, deploy, validate]
+monitoring: [metric to watch, acceptable range]
+rollback_triggers: [conditions that trigger rollback]
 ```
 
-**Staged Rollout (if possible):**
+**Staged Rollout:**
 1. Deploy to single server
-2. Monitor for 5-10 minutes
-3. If stable, deploy to all servers
-4. Monitor for 30 minutes
+2. Monitor 5-10 minutes
+3. Deploy to all servers if stable
+4. Monitor 30+ minutes
 
-### Phase 7: VERIFY (15-30 minutes)
+---
 
-**Invoke:** `production-verification-checker` skill
+### Phase 7: VERIFY (15-30 min)
+
+**Skill:** `production-verification-checker`
 
 **Verify:**
-- Issue is resolved
-- No new errors introduced
-- Performance is acceptable
-- Users can proceed normally
+- Issue resolved
+- No new errors
+- Performance acceptable
+- Users can proceed
 
-**Monitor:**
-- Error rates
-- Response times
-- Success rates
-- User feedback
+**Monitor:** Error rates, response times, success rates, user feedback
+
+---
 
 ### Phase 8: DOCUMENT & FOLLOW-UP
 
-**Invoke Skills:**
-1. `hotfix-incident-documenter` - Create incident report
-2. `postmortem-planner` - Plan postmortem
-3. `proper-fix-planner` - Plan permanent solution
+**Skills:** `hotfix-incident-documenter`, `postmortem-planner`, `proper-fix-planner`
 
-**Required Documentation:**
+**Required:**
 ```yaml
 incident_report:
   summary: <what happened>
@@ -236,145 +220,140 @@ incident_report:
   lessons_learned: [<list>]
 ```
 
+---
+
+## DO:
+✅ Always default to manual mode (approve every phase)
+✅ Test rollback before deploying fix
+✅ Document everything (what, why, how to revert)
+✅ Monitor continuously for 30+ minutes post-deploy
+✅ Plan proper fix (hotfix is temporary)
+✅ Prefer rollback over code fix when safe
+✅ Use minimal changes only
+✅ Reference TEMPLATES.md for all outputs
+
+## DON'T:
+❌ Deploy without rollback plan
+❌ Skip rollback testing
+❌ Make changes beyond minimal fix
+❌ Add "improvements" or refactoring
+❌ Continue with LOW root cause confidence
+❌ Deploy without verification
+❌ Skip incident documentation
+❌ Forget to plan proper fix
+❌ Skip postmortem for critical incidents
+
+---
+
+## Error Handling
+
+**IF rollback is safer:**
+```
+1. Stop at phase 4 (strategy)
+2. Recommend rollback:
+   ⚠️ RECOMMENDATION: Rollback safer than fix
+   REASON: Recent deployment caused issue
+   RISK: Fix has higher risk than rollback
+   ACTION: Proceed with rollback instead
+```
+
+**IF root cause confidence LOW:**
+```
+1. Stop at phase 3 (diagnose)
+2. Present options:
+   ⚠️ CONFIDENCE TOO LOW
+   Cannot fix without understanding root cause
+   OPTIONS:
+   [ ] Rollback (if available)
+   [ ] Feature disable (temporary)
+   [ ] Spike investigation (may take time)
+   [ ] Find workaround
+```
+
+**IF fix requires extensive changes:**
+```
+1. Stop at phase 4 (strategy)
+2. Escalate:
+   🛑 NOT SUITABLE FOR HOTFIX
+   REASON: Requires extensive changes
+   RISK: Too high for emergency deployment
+   RECOMMENDATION:
+   - Implement workaround NOW
+   - Plan proper fix through normal process
+```
+
+---
+
 ## Hotfix Types
 
 ### Type 1: Rollback
-**When:** Recent deployment caused issue
-```yaml
-action: "Revert to previous deployment"
-time: "15-20 minutes"
-risk: "Low (known good state)"
-```
+- When: Recent deployment caused issue
+- Time: 15-20 minutes
+- Risk: LOW (known good state)
 
 ### Type 2: Config Change
-**When:** Issue can be resolved by configuration
-```yaml
-action: "Update app settings or feature flags"
-time: "5-10 minutes"
-risk: "Very Low"
-```
+- When: Issue resolved by configuration
+- Time: 5-10 minutes
+- Risk: VERY LOW
 
 ### Type 3: Data Fix
-**When:** Bad data causing failures
-```yaml
-action: "Update/delete problematic data"
-time: "10-30 minutes"
-risk: "Medium (data integrity)"
-caution: "Backup first, validate after"
-```
+- When: Bad data causing failures
+- Time: 10-30 minutes
+- Risk: MEDIUM (backup first, validate after)
 
 ### Type 4: Code Patch
-**When:** Must fix code in production
-```yaml
-action: "Deploy minimal code change"
-time: "60-90 minutes"
-risk: "Medium to High"
-requirements:
-  - Minimal change
-  - Tested
-  - Rollback ready
-```
+- When: Must fix code in production
+- Time: 60-90 minutes
+- Risk: MEDIUM to HIGH (requires minimal change, tested, rollback ready)
 
-## Communication Template
+---
+
+## Communication
+
+Use templates from `copilot/TEMPLATES.md`
 
 **Initial Alert:**
 ```
 INCIDENT: <brief description>
-SEVERITY: <Critical|High>
+SEVERITY: Critical | High
 IMPACT: <who/what affected>
 STATUS: Investigating
-ETA: <best estimate>
+ETA: <estimate>
 WORKAROUND: <if available>
 ```
 
-**Update:**
-```
-UPDATE: <progress>
-ROOT CAUSE: <if known>
-FIX: <in progress|testing|deploying>
-ETA: <updated estimate>
-```
+**Updates:** Progress, root cause, fix status, ETA
 
-**Resolution:**
-```
-RESOLVED: <timestamp>
-DURATION: <total time>
-FIX APPLIED: <description>
-MONITORING: <ongoing for X hours>
-FOLLOW-UP: <ticket for proper fix>
-```
+**Resolution:** Timestamp, duration, fix applied, monitoring, follow-up ticket
 
-## Output Format
-
-```yaml
-hotfix_summary:
-  incident_id: <identifier>
-  
-  impact:
-    severity: <critical|high>
-    started: <timestamp>
-    duration: <minutes>
-    users_affected: <count or percentage>
-  
-  diagnosis:
-    root_cause: <explanation>
-    triggering_event: <deployment|config|data|unknown>
-  
-  resolution:
-    strategy: <rollback|config|code|data>
-    changes_made: [<list>]
-    deployed_at: <timestamp>
-    verified_at: <timestamp>
-  
-  safety:
-    rollback_tested: <yes|no>
-    monitoring_active: <yes|no>
-    risk_level: <low|medium|high>
-  
-  follow_up:
-    proper_fix_needed: <yes|no>
-    proper_fix_ticket: <jira id>
-    postmortem_scheduled: <yes|no>
-  
-  artifacts:
-    - incident_report
-    - hotfix_code (if applicable)
-    - deployment_log
-    - verification_results
-```
+---
 
 ## Safety Rules (NON-NEGOTIABLE)
 
 1. **Always Have Rollback**
-   - Never deploy without rollback plan
    - Test rollback before deploying fix
 
 2. **Minimal Change Only**
-   - Fix ONLY the critical issue
-   - No "improvements"
-   - No refactoring
+   - Fix ONLY critical issue, no improvements
 
 3. **Document Everything**
-   - What changed
-   - Why it changed
-   - How to revert
+   - What changed, why, how to revert
 
 4. **Monitor Continuously**
-   - Watch metrics for 30+ minutes post-deploy
-   - Have team member monitoring
+   - 30+ minutes post-deploy
 
 5. **Plan Proper Fix**
-   - Hotfix is temporary
-   - Create ticket for proper solution
-   - Schedule postmortem
+   - Create ticket, schedule postmortem
+
+---
 
 ## When NOT to Hotfix
 
 **Don't hotfix if:**
-- Issue is not truly critical
-- Rollback is safer and available
+- Issue not truly critical
+- Rollback safer and available
 - Fix requires extensive changes
-- Root cause is unclear
+- Root cause unclear
 - Risk outweighs benefit
 
 **Instead:**
@@ -383,56 +362,98 @@ hotfix_summary:
 - Scale resources temporarily
 - Fix through normal process
 
-## Example Hotfix
+---
 
-**Incident:** "Orders failing to submit, 100% failure rate"
+## Complete Example
 
-### Assessment
-```yaml
-severity: critical
-scope: all_users
-data_at_risk: no (failing before save)
-workaround: no
-decision: immediate_hotfix
+**Incident:** "Orders failing 100% - NullReferenceException"
+
+```
+Phase 1: Assessment
+→ SKILL: production-impact-assessor
+→ OUTPUT:
+  severity: CRITICAL
+  scope: all_users
+  data_at_risk: no (failing before save)
+  workaround: no
+  decision: IMMEDIATE_HOTFIX
+
+Phase 2: Stabilize
+→ Not applicable (no way to disable orders)
+
+Phase 3: Diagnose
+→ SKILLS: production-log-analyzer, change-history-analyzer
+→ OUTPUT:
+  root_cause: "NullReferenceException in ShippingCalculator"
+  trigger: "Deployment 2 hours ago"
+  confidence: HIGH
+  evidence: "100% of errors same stack trace"
+
+═══════════════════════════════════════════════════════════════
+CHECKPOINT: Diagnosis Complete (manual mode)
+═══════════════════════════════════════════════════════════════
+
+Phase 4: Strategy
+→ SKILL: hotfix-strategy-planner
+→ OUTPUT:
+  chosen: ROLLBACK
+  reasoning: "Recent deployment, rollback safest"
+  alternative: "Could patch code, but rollback faster/safer"
+
+═══════════════════════════════════════════════════════════════
+CHECKPOINT: Strategy Approved (manual mode)
+═══════════════════════════════════════════════════════════════
+
+Phase 5: Implement
+→ Actions:
+  1. Create rollback deployment
+  2. Test rollback in staging - PASSED
+
+Phase 6: Deploy
+→ Actions:
+  1. Deploy rollback to production
+  2. Monitor for errors
+
+Phase 7: Verify
+→ SKILL: production-verification-checker
+→ OUTPUT:
+  issue_resolved: YES
+  new_errors: NO
+  performance: NORMAL
+  monitoring_duration: 30 minutes
+
+Phase 8: Document
+→ SKILLS: hotfix-incident-documenter, proper-fix-planner
+→ OUTPUT:
+  incident_report: Created
+  proper_fix_ticket: PROJ-5678
+  root_cause: "Missing null check on ShippingMethod.Carrier"
+  permanent_fix: "Add null check, use default carrier"
+  postmortem: Scheduled
+
+✅ HOTFIX COMPLETE ✅
+MODE: HOTFIX (Manual)
+TIME: 22 minutes from decision to resolution
+CHECKPOINTS: 6 (every phase requires approval)
+RISK: LOW (rollback to known good state)
+STATUS: RESOLVED, monitoring ongoing
 ```
 
-### Diagnosis
-```yaml
-root_cause: "NullReferenceException in ShippingCalculator"
-trigger: "Deployment 2 hours ago"
-confidence: high
-evidence: "100% of errors same stack trace"
-```
+---
 
-### Strategy
-```yaml
-chosen: rollback
-reasoning: "Recent deployment, rollback is safest"
-alternative: "Could patch code, but rollback faster and safer"
-```
+## Constraints (Non-Negotiable)
 
-### Execution
-```yaml
-actions:
-  1: "Created rollback deployment"
-  2: "Tested rollback in staging - passed"
-  3: "Deployed rollback to production"
-  4: "Monitored for 30 minutes - no errors"
-duration: "22 minutes from decision to resolution"
-```
-
-### Follow-up
-```yaml
-proper_fix: "PROJ-5678"
-root_cause: "Didn't handle missing ShippingMethod.Carrier"
-permanent_fix: "Add null check and use default carrier"
-postmortem: "Scheduled for next day"
-```
-
-## Constraints
 - NEVER skip rollback planning
-- NEVER make changes beyond minimal fix
 - NEVER deploy without verification
+- NEVER make changes beyond minimal fix
 - ALWAYS document incident
 - ALWAYS plan proper fix
 - ALWAYS conduct postmortem for critical incidents
+- ALWAYS use manual mode unless explicitly overridden
+
+---
+
+**See also:**
+- Templates: `copilot/TEMPLATES.md`
+- Execution rules: `copilot/specs/EXECUTION_RULES.md`
+- Integration: `copilot/COPILOT_INTEGRATION.md`
