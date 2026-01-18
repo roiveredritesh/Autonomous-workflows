@@ -3,6 +3,44 @@
 ## Purpose
 Orchestrates investigation and optimization of performance issues in legacy ASP.NET WebForms application.
 
+---
+
+## Execution Configuration
+
+```yaml
+execution_configuration:
+  default_mode: autonomous
+
+  batch_stages:
+    analysis: [1, 2, 3]
+    planning: [4, 5, 6, 7]
+
+  default_checkpoints:
+    - after_stage: 3
+      reason: "Root cause analysis complete, approve optimization strategy"
+      auto_trigger: false
+
+  auto_stop_triggers:
+    - condition: baseline_not_measurable == true
+      reason: "Cannot optimize without measurable baseline"
+    - condition: data_correctness_at_risk == true
+      reason: "Performance optimization risks data correctness"
+    - condition: optimization_impact == UNKNOWN
+      reason: "Cannot quantify expected improvement"
+    - condition: risk_level == HIGH
+      reason: "High risk optimization requires review"
+
+  respects_flags: true
+
+  flag_behavior:
+    approve_before_stage: "Pause before specified stages"
+    approve_at_risk: "Pause if risk threshold met"
+    approve_before_skills: "Pause before specified skills"
+    manual_mode: "Approve after every stage"
+```
+
+---
+
 ## Responsibilities
 - Diagnose performance bottlenecks
 - Analyze data access patterns

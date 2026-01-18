@@ -3,6 +3,44 @@
 ## Purpose
 Orchestrates end-to-end delivery of new features in legacy ASP.NET WebForms application.
 
+---
+
+## Execution Configuration
+
+```yaml
+execution_configuration:
+  default_mode: autonomous
+
+  batch_stages:
+    analysis: [1, 2, 3, 4, 5]
+    planning: [6, 7, 8, 9]
+
+  default_checkpoints:
+    - after_stage: 5
+      reason: "Analysis complete, approve planning"
+      auto_trigger: false
+
+  auto_stop_triggers:
+    - condition: risk_level == HIGH
+      reason: "High risk requires human review"
+    - condition: confidence == LOW
+      reason: "Low confidence needs investigation"
+    - condition: safety_violation == true
+      reason: "Safety violation must be addressed"
+    - condition: public_api_change == true
+      reason: "Public API changes require justification"
+
+  respects_flags: true
+
+  flag_behavior:
+    approve_before_stage: "Pause before specified stages"
+    approve_at_risk: "Pause if risk threshold met"
+    approve_before_skills: "Pause before specified skills"
+    manual_mode: "Approve after every stage"
+```
+
+---
+
 ## Responsibilities
 - Ensure requirement clarity
 - Assess feasibility and risk

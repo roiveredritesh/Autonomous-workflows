@@ -3,6 +3,49 @@
 ## Purpose
 Orchestrates rapid, safe resolution of critical production issues in legacy ASP.NET WebForms application.
 
+---
+
+## Execution Configuration
+
+```yaml
+execution_configuration:
+  default_mode: manual  # Hotfixes require careful human oversight
+
+  batch_stages:
+    assessment: [1, 2, 3]
+    execution: [4, 5, 6, 7, 8]
+
+  default_checkpoints:
+    - after_stage: 3
+      reason: "Diagnosis complete, approve fix strategy"
+      auto_trigger: true
+    - after_stage: 5
+      reason: "Implementation ready, approve deployment"
+      auto_trigger: true
+
+  auto_stop_triggers:
+    - condition: rollback_safer_than_fix == true
+      reason: "Rollback is safer option"
+    - condition: root_cause_confidence == LOW
+      reason: "Cannot fix with low confidence in root cause"
+    - condition: fix_risk == HIGH
+      reason: "Fix risk too high for hotfix, need different approach"
+    - condition: requires_extensive_changes == true
+      reason: "Extensive changes not suitable for hotfix"
+
+  respects_flags: true
+
+  flag_behavior:
+    approve_before_stage: "Pause before specified stages"
+    approve_at_risk: "Pause if risk threshold met (always pauses for HIGH)"
+    approve_before_skills: "Pause before specified skills"
+    manual_mode: "Approve after every stage (default for hotfix)"
+
+  special_notes: "Hotfix mode defaults to manual for safety. Use autonomous only with explicit approval_override flag."
+```
+
+---
+
 ## Responsibilities
 - Assess production impact
 - Determine fastest safe resolution

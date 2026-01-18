@@ -3,6 +3,41 @@
 ## Purpose
 Orchestrates time-boxed investigation of unknowns in legacy ASP.NET WebForms application.
 
+---
+
+## Execution Configuration
+
+```yaml
+execution_configuration:
+  default_mode: autonomous
+
+  batch_stages:
+    investigation: [1, 2, 3, 4]
+
+  default_checkpoints:
+    - after_stage: 4
+      reason: "Investigation complete, present findings"
+      auto_trigger: true
+
+  auto_stop_triggers:
+    - condition: time_box_exceeded == true
+      reason: "Time box limit reached"
+    - condition: scope_creep_detected == true
+      reason: "Investigation scope expanded beyond charter"
+    - condition: confidence == HIGH && question_answered == true
+      reason: "Question answered with high confidence, stop early"
+
+  respects_flags: true
+
+  flag_behavior:
+    approve_before_stage: "Pause before specified stages"
+    approve_at_risk: "Pause if risk threshold met"
+    approve_before_skills: "Pause before specified skills"
+    manual_mode: "Approve after every stage"
+```
+
+---
+
 ## Responsibilities
 - Frame research questions clearly
 - Execute focused investigation

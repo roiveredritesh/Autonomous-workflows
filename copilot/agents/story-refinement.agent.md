@@ -3,6 +3,41 @@
 ## Purpose
 Transforms unclear or incomplete requirements into well-defined, implementable work items.
 
+---
+
+## Execution Configuration
+
+```yaml
+execution_configuration:
+  default_mode: autonomous
+
+  batch_stages:
+    analysis: [1, 2, 3, 4, 5, 6]
+
+  default_checkpoints:
+    - after_stage: 6
+      reason: "Refinement complete, present refined story"
+      auto_trigger: true
+
+  auto_stop_triggers:
+    - condition: critical_information_missing == true
+      reason: "Cannot refine without critical information from stakeholder"
+    - condition: conflicting_requirements == true
+      reason: "Conflicting requirements need stakeholder resolution"
+    - condition: scope_too_large == true
+      reason: "Story needs to be split into multiple stories"
+
+  respects_flags: true
+
+  flag_behavior:
+    approve_before_stage: "Pause before specified stages"
+    approve_at_risk: "Pause if risk threshold met"
+    approve_before_skills: "Pause before specified skills"
+    manual_mode: "Approve after every stage"
+```
+
+---
+
 ## Responsibilities
 - Extract clear requirements from ambiguous input
 - Generate comprehensive acceptance criteria

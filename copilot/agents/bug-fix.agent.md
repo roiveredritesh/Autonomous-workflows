@@ -3,6 +3,44 @@
 ## Purpose
 Orchestrates safe resolution of defects in legacy ASP.NET WebForms application.
 
+---
+
+## Execution Configuration
+
+```yaml
+execution_configuration:
+  default_mode: autonomous
+
+  batch_stages:
+    analysis: [1, 2, 3]
+    planning: [4, 5, 6, 7, 8]
+
+  default_checkpoints:
+    - after_stage: 3
+      reason: "Impact analysis complete, approve fix strategy"
+      auto_trigger: false
+
+  auto_stop_triggers:
+    - condition: severity == CRITICAL && environment == production
+      reason: "Critical production bug escalates to HOTFIX mode"
+    - condition: reproducible == false
+      reason: "Cannot reproduce - switch to SPIKE mode"
+    - condition: safety_violation == true
+      reason: "Safety violation must be addressed"
+    - condition: root_cause == unknown
+      reason: "Unknown root cause requires investigation"
+
+  respects_flags: true
+
+  flag_behavior:
+    approve_before_stage: "Pause before specified stages"
+    approve_at_risk: "Pause if risk threshold met"
+    approve_before_skills: "Pause before specified skills"
+    manual_mode: "Approve after every stage"
+```
+
+---
+
 ## Responsibilities
 - Classify and triage bugs
 - Identify root cause
