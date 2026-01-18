@@ -1,6 +1,40 @@
+---
+version: 2.0.0
+last_updated: 2026-01-18
+purpose: Main instructions for GitHub Copilot autonomous workflow system
+compatibility: github-copilot-2026
+priority: critical
+---
+
 # GitHub Copilot - Autonomous Workflow Instructions
 
 You are an AI assistant using an autonomous workflow system with execution flags.
+
+---
+
+## Quick Example (Read This First)
+
+```
+User: "Add Excel export to customer list"
+
+YOU DO:
+1. Parse flags: (none) → autonomous mode
+2. Detect mode: "add" → FEATURE mode
+3. Load: copilot/agents/feature-delivery.agent.md
+4. Execute: Stages 1-5 (analysis) in batch
+5. Execute: Stages 6-9 (planning) in batch
+6. Present: Complete plan (45 seconds total)
+
+OUTPUT:
+✅ WORKFLOW COMPLETE ✅
+MODE: FEATURE | TIME: 45s | RISK: LOW | CONFIDENCE: HIGH
+Deliverables: Requirements, Implementation plan, Tests, Docs, Rollback
+READY FOR: Implementation
+```
+
+**That's the goal:** Fast, safe, autonomous execution with clear outputs.
+
+---
 
 ## How This System Works
 
@@ -10,285 +44,475 @@ You operate in **AUTONOMOUS MODE by default**, executing workflows in batches an
 - High risk encountered
 - Low confidence in approach
 
-## Entry Point: Orchestrator
+---
 
-When user provides a request, you MUST:
+## 5-Step Execution Process
 
-1. **Parse Execution Flags** (if provided)
-2. **Detect MODE** from request
-3. **Load appropriate agent** with flag configuration
-4. **Execute workflow** per agent's batch configuration
-5. **Present results** at checkpoints or completion
+### Step 1: Parse Execution Flags
 
-## Execution Flags
-
-User can control execution with optional flags:
+**Check user input for flags:**
 
 ```yaml
-# Pause before specific stages
-approve_before_stage: [6]
+# No flags = full autonomous
+User: "Add Excel export"
 
-# Pause if risk meets threshold
-approve_at_risk: medium
-
-# Pause before specific skills
-approve_before_skills: [linq-query-tracer]
-
-# Full manual control (approve every stage)
-manual_mode: true
+# With flags = controlled execution
+User: "Add Excel export"
+Flags:
+  approve_before_stage: [6]
+  approve_at_risk: medium
 ```
 
-**Default (no flags):** Full autonomous execution
+**Flag Types:**
+- `approve_before_stage: [N]` - Pause before stage N
+- `approve_at_risk: <level>` - Pause if risk >= level
+- `approve_before_skills: [skill-name]` - Pause before skill
+- `manual_mode: true` - Approve every stage
 
-## Mode Detection
+**Default if missing:** Autonomous mode (no pauses except auto-stops)
 
-Detect mode from request and load corresponding agent:
+---
 
-| Keywords/Pattern | Mode | Agent |
-|-----------------|------|-------|
-| "add", "new", "implement" | FEATURE | feature-delivery |
-| "bug", "fix", "broken", "error" | BUG | bug-fix |
-| "production", "urgent", "critical" | HOTFIX | hotfix |
-| "slow", "optimize", "performance" | PERFORMANCE | performance |
-| "investigate", "why", "explore" | SPIKE | spike |
-| Unclear requirements | REFINEMENT | story-refinement |
+### Step 2: Detect MODE
 
-## Agent Loading
+**Mode Detection Table:**
 
-Load agent from: `copilot/agents/{agent-name}.agent.md`
+| Keywords/Pattern | Mode | Agent File |
+|-----------------|------|------------|
+| "add", "new", "implement", "create" | FEATURE | feature-delivery.agent.md |
+| "bug", "fix", "broken", "error", "failing" | BUG | bug-fix.agent.md |
+| "production", "urgent", "critical", "emergency" | HOTFIX | hotfix.agent.md |
+| "slow", "optimize", "performance", "speed up" | PERFORMANCE | performance.agent.md |
+| "investigate", "why", "explore", "understand" | SPIKE | spike.agent.md |
+| Unclear/vague requirements | REFINEMENT | story-refinement.agent.md |
 
-Each agent defines:
-- Execution configuration (autonomous/manual default)
-- Batch stages
-- Checkpoints
-- Auto-stop triggers
-- Required stages
+**Confidence Check:**
+- If confidence < MEDIUM in mode detection → Escalate to REFINEMENT mode
+
+---
+
+### Step 3: Load Agent
+
+**Location:** `copilot/agents/{agent-name}.agent.md`
+
+**Each agent provides:**
+- Quick example showing expected outcome
+- Execution configuration (batch stages, checkpoints)
+- Stage-by-stage process
+- DO/DON'T lists
+- Required skills per stage
+- Error handling instructions
+
+**Read the ENTIRE agent file** before executing.
+
+---
+
+### Step 4: Execute Workflow
+
+**Batch Execution:**
+
+```yaml
+Analysis Batch (Stages 1-5):
+  1. Intake/Validation
+  2. Requirement Clarity
+  3. Feasibility & Risk
+  4. System & Legacy Impact
+  5. Data & Cache Impact
+  ↓
+  [Checkpoint if flagged OR auto-stop triggered]
+  ↓
+Planning Batch (Stages 6-9):
+  6. Implementation Planning
+  7. Testing & QA Planning
+  8. Documentation
+  9. Rollback Readiness
+  ↓
+  [Present complete results]
+```
+
+**Execute sequentially within batch, present consolidated results.**
+
+---
+
+### Step 5: Present Results
+
+**Use EXACT templates from:** `copilot/TEMPLATES.md`
+
+**For checkpoints:** Use Checkpoint Template
+**For skills:** Use Skill Invocation Template
+**For errors:** Use Error Handling Template
+**For safety:** Use Safety Violation Template
+**For completion:** Use Completion Template
+
+**CRITICAL:** Copy templates exactly, replace {placeholders}.
+
+---
 
 ## Execution Rules (Non-Negotiable)
 
-### Safety Rules - ALWAYS STOP if:
-- Public API change without justification
-- WebForms lifecycle violation
-- Telerik contract breakage
-- No rollback procedure possible
-- Data corruption risk
+### Safety Rules - IMMEDIATE STOP if:
 
-### Risk Rules - ALWAYS CHECKPOINT if:
-- Risk level: HIGH
-- Confidence: LOW
-- Production environment (HOTFIX mode)
+```yaml
+🛑 SAFETY VIOLATIONS (Cannot be overridden):
+  - Public API change without justification
+  - WebForms lifecycle violation
+  - Telerik contract breakage
+  - No rollback procedure possible
+  - Data corruption risk detected
+```
 
-### Flag Rules - MUST RESPECT:
-- manual_mode overrides all other flags
-- approve_before_stage: pause before specified stages
-- approve_at_risk: pause if risk >= threshold
-- approve_before_skills: pause before specified skills
+**Action:** Use Safety Violation Template from TEMPLATES.md
 
-**Priority Order:**
-1. manual_mode (highest)
-2. Safety violations
-3. HIGH risk
-4. approve_at_risk
-5. approve_before_stage
-6. approve_before_skills
-7. checkpoint_strategy
-8. Agent defaults
+---
+
+### Risk Rules - AUTOMATIC CHECKPOINT if:
+
+```yaml
+⚠️ AUTO-STOP CONDITIONS:
+  - Risk level: HIGH
+  - Confidence: LOW
+  - Production environment (HOTFIX mode always manual)
+  - Conflicting requirements detected
+```
+
+**Action:** Use Checkpoint Template from TEMPLATES.md
+
+---
+
+### Flag Rules - MUST RESPECT
+
+**Priority Order (Highest to Lowest):**
+
+1. `manual_mode: true` - Overrides ALL other flags
+2. Safety violations - Cannot be disabled
+3. HIGH risk auto-stop - Cannot be disabled
+4. `approve_at_risk: <level>` - User-defined threshold
+5. `approve_before_stage: [N]` - Explicit stage gates
+6. `approve_before_skills: [name]` - Explicit skill gates
+7. `checkpoint_strategy` - General strategy
+8. Agent defaults - Fallback behavior
+
+**Conflict Resolution:**
+- If `manual_mode: true`, ignore all other flags
+- If multiple triggers at same stage, merge into single checkpoint
+- If impossible configuration, reject with clear error
+
+---
 
 ## Skill Invocation
 
-Skills are in: `copilot/skills/{skill-name}.skill.md`
+**Location:** `copilot/skills/{skill-name}.skill.md`
 
-Invoke skills as needed during stages:
-- Parse skill definition
-- Provide required inputs
-- Execute skill logic
-- Return structured output (with risk, confidence)
-- Pause if skill flagged in approve_before_skills
+**Process:**
+1. Read skill definition file
+2. Prepare inputs (context, parameters)
+3. Execute skill logic
+4. **Use Skill Invocation Template** from TEMPLATES.md
+5. Return structured output (result, risks, confidence)
+6. Pause if skill in `approve_before_skills` flag
 
-## Checkpoint Presentation Format
+**ALWAYS use template for consistency.**
 
-When checkpoint required:
+---
+
+## Templates (CRITICAL)
+
+**Reference:** `copilot/TEMPLATES.md`
+
+**Available Templates:**
+1. **Checkpoint Template** - Use at all checkpoints
+2. **Skill Invocation Template** - Use for every skill
+3. **Error Handling Template** - Critical & non-critical errors
+4. **Safety Violation Template** - Safety rule violations
+5. **Mode Escalation Template** - When switching modes
+6. **Completion Template** - Workflow successfully finished
+
+**Rules:**
+- ✅ Copy templates EXACTLY
+- ✅ Replace {placeholders} with actual values
+- ✅ Keep formatting (boxes, lines, spacing)
+- ❌ NEVER modify template structure
+- ❌ NEVER abbreviate or summarize
+
+---
+
+## Error Handling
+
+### IF Skill Fails:
 
 ```yaml
-=== CHECKPOINT: {name} ===
+1. Determine criticality:
+   CRITICAL: Stop workflow, use Error Template
+   NON_CRITICAL: Log warning, continue with degraded info
 
-STAGES COMPLETED: {list}
+2. Present using appropriate template:
+   - Critical: Critical Error Template
+   - Non-critical: Warning Template
 
-CONSOLIDATED RESULTS:
-{all outputs from completed stages}
-
-RISK: {LOW|MEDIUM|HIGH}
-Factors: {list}
-
-CONFIDENCE: {HIGH|MEDIUM|LOW}
-
-DECISION REQUIRED:
-{specific question}
-
-Options:
-  [ ] Approve - Continue execution
-  [ ] Adjust - Modify approach
-  [ ] Spike - Need investigation
-  [ ] Reject - Stop workflow
-
-NEXT STEPS IF APPROVED:
-{what will happen next}
-
-===========================
+3. Offer options:
+   - Retry with different parameters
+   - Skip (if non-critical)
+   - Switch to SPIKE mode
+   - Abort workflow
 ```
 
-## Response Handling
+### IF Stage Fails:
 
-User responses at checkpoints:
-- **"Approve"/"Yes"** → Continue execution
-- **"Adjust: {details}"** → Modify parameters, re-run affected stages
-- **"Spike"** → Switch to SPIKE mode, investigate, return findings
-- **"Reject"/"Stop"** → Stop workflow, preserve work done
+```yaml
+1. STOP at failed stage
+2. Present partial results
+3. Explain what failed and why
+4. Use Error Handling Template
+5. Offer recovery options
+```
 
-## Batch Execution
+**NEVER:**
+- Continue silently after critical error
+- Hide errors from user
+- Guess at missing information
 
-Execute stages in batches per agent configuration:
-
-**Analysis Batch (stages 1-5):**
-1. Intake/Validation
-2. Requirement Clarity
-3. Feasibility & Risk Assessment
-4. System & Legacy Impact
-5. Data & Cache Impact
-
-**Planning Batch (stages 6-9):**
-6. Implementation Planning
-7. Testing & QA Planning
-8. Documentation
-9. Rollback Readiness
-
-Present consolidated output at batch completion or checkpoint.
+---
 
 ## Mode Escalation
 
-Automatically escalate when:
-- **To HOTFIX:** BUG + severity=CRITICAL + production
-- **To SPIKE:** confidence=LOW or approach=unknown
-- **To REFINEMENT:** requirements unclear or conflicting
-- **To FEATURE:** BUG scope larger than simple fix
+**Automatic Escalation Conditions:**
 
-## Example: Full Autonomous (No Flags)
+```yaml
+BUG → HOTFIX:
+  Trigger: severity == CRITICAL && environment == production
+  Action: Load hotfix.agent.md (manual mode enforced)
+
+ANY → SPIKE:
+  Trigger: confidence == LOW || technical_approach == unknown
+  Action: Load spike.agent.md, time-box investigation
+
+ANY → REFINEMENT:
+  Trigger: requirements_unclear || conflicting_requirements
+  Action: Load story-refinement.agent.md, clarify requirements
+
+BUG → FEATURE:
+  Trigger: scope > simple_fix
+  Action: Load feature-delivery.agent.md
+```
+
+**Use Mode Escalation Template** when escalating.
+
+---
+
+## DO and DON'T
+
+### ✅ DO:
+
+- Parse flags BEFORE execution
+- Read ENTIRE agent file
+- Execute stages sequentially within batch
+- Use EXACT templates from TEMPLATES.md
+- Stop immediately on safety violations
+- Respect user-provided flags
+- Present consolidated results
+- Document all decisions
+- Check risk after each stage
+
+### ❌ DON'T:
+
+- Skip safety checks
+- Continue after HIGH risk without approval
+- Modify flags after parsing
+- Present results piecemeal (batch them)
+- Make assumptions about unclear requirements
+- Change template formats
+- Hide errors or warnings
+- Bypass checkpoints
+- Ignore auto-stop conditions
+
+---
+
+## Response Handling
+
+**User responses at checkpoints:**
+
+```yaml
+"Approve" | "Yes" | "Continue" | "Proceed":
+  Action: Continue execution from checkpoint
+  Preserve: All completed work
+  Respect: Remaining flags and checkpoints
+
+"Adjust: <details>":
+  Action: Parse adjustment request
+  Modify: Affected parameters
+  Re-run: Impacted stages only
+  Continue: From adjusted state
+
+"Spike" | "Investigate":
+  Action: Switch to SPIKE mode
+  Time-box: 4 hours default
+  Return: With findings
+  Resume: Or restart based on findings
+
+"Reject" | "Stop" | "Cancel":
+  Action: Stop workflow immediately
+  Preserve: All work done so far
+  Document: Rejection reason
+  Allow: Restart with different approach
+```
+
+---
+
+## Performance Guidelines
+
+**BATCH these operations:**
+- Executing stages 1-5 (analysis)
+- Executing stages 6-9 (planning)
+- Invoking multiple related skills
+- Presenting consolidated results
+
+**DO NOT BATCH:**
+- Safety checks (always immediate)
+- Checkpoint presentations (always pause)
+- User input requests (always wait)
+- Error handling (always immediate)
+
+**Goal:** Minimize user interruptions while maintaining safety.
+
+---
+
+## Complete Example Workflows
+
+### Example 1: Full Autonomous (No Flags)
 
 ```
 User: "Add Excel export to customer list"
 
-You:
-[Execute ALL stages 1-9 in batches]
+Step 1: Parse flags → None → Autonomous mode
+Step 2: Detect mode → "add" → FEATURE
+Step 3: Load → copilot/agents/feature-delivery.agent.md
+Step 4: Execute → Stages 1-9 in two batches
+Step 5: Present → Complete plan using Completion Template
 
-Output after 45 seconds:
-================================
-MODE: FEATURE
-EXECUTION: Autonomous
-
-ANALYSIS (Stages 1-5):
-✓ Requirements expanded
-✓ Feasibility: HIGH, Risk: LOW
-✓ Legacy impact: minimal
-✓ No caching needed
-
-PLAN (Stages 6-9):
-✓ Implementation plan
-✓ Test scenarios
-✓ Documentation
-✓ Rollback procedure
-
-READY FOR: Implementation
-================================
+Time: 45 seconds
+Checkpoints: 0 (no stops triggered)
+Output: Ready for implementation
 ```
 
-## Example: Checkpoint Before Implementation
+### Example 2: With Checkpoint (approve_before_stage: [6])
 
 ```
-User: "Add email notifications"
+User: "Add Excel export"
 Flags:
   approve_before_stage: [6]
 
-You:
-[Execute stages 1-5]
-
-=== CHECKPOINT: Analysis Complete ===
-[Present analysis]
-Approve implementation planning?
-===================================
-
-[Wait for user response]
+Step 1: Parse flags → Checkpoint before stage 6
+Step 2: Detect mode → FEATURE
+Step 3: Load → feature-delivery.agent.md
+Step 4a: Execute → Stages 1-5
+Step 5a: Present → Using Checkpoint Template → WAIT
 
 User: "Approve"
 
-[Execute stages 6-9]
-[Present complete plan]
+Step 4b: Execute → Stages 6-9
+Step 5b: Present → Using Completion Template
+
+Time: 50 seconds + user decision time
+Checkpoints: 1
+Output: Ready for implementation
 ```
 
-## Example: Risk-Based Pausing
+### Example 3: Risk-Based (approve_at_risk: medium)
 
 ```
 User: "Optimize customer search query"
 Flags:
   approve_at_risk: medium
 
-You:
-[Execute stages 1-4]
-[Stage 4 detects MEDIUM risk]
+Step 1: Parse flags → Pause if risk >= MEDIUM
+Step 2: Detect mode → PERFORMANCE
+Step 3: Load → performance.agent.md
+Step 4a: Execute → Stages 1-4
+       Stage 4 detects MEDIUM risk → AUTO-STOP
+Step 5a: Present → Using Checkpoint Template → WAIT
 
-=== CHECKPOINT: Risk Threshold Reached ===
-RISK: MEDIUM
-Root cause: N+1 query, missing index
-Mitigation: Add index (LOW risk) vs Rewrite query (MEDIUM risk)
-Recommendation: Add index
+User: "Approve"
 
-Approve recommended approach?
-==========================================
+Step 4b: Execute → Stages 5-9
+Step 5b: Present → Using Completion Template
 
-[Wait for user response]
+Time: Variable + user decision
+Checkpoints: 1 (risk-triggered)
 ```
+
+### Example 4: Safety Violation
+
+```
+User: "Change CustomerRepository.Search signature"
+
+Step 1: Parse flags → None
+Step 2: Detect mode → FEATURE
+Step 3: Load → feature-delivery.agent.md
+Step 4: Execute → Stages 1-5
+       Stage 6 detects public API change → SAFETY VIOLATION
+Step 5: Present → Using Safety Violation Template → STOP
+
+Cannot continue without:
+  - Fixing violation OR
+  - Providing explicit justification
+
+Time: 30 seconds
+Outcome: STOPPED (safety)
+```
+
+---
 
 ## Key Files Reference
 
-**Agent Definitions:**
-- `copilot/agents/orchestrator.agent.md` - Entry point, mode detection
-- `copilot/agents/feature-delivery.agent.md` - New features
-- `copilot/agents/bug-fix.agent.md` - Bug fixes
-- `copilot/agents/hotfix.agent.md` - Production emergencies
-- `copilot/agents/performance.agent.md` - Performance optimization
-- `copilot/agents/spike.agent.md` - Time-boxed investigation
-- `copilot/agents/story-refinement.agent.md` - Requirements clarification
+**Main Instructions:**
+- `copilot/COPILOT_INTEGRATION.md` (this file)
+- `copilot/TEMPLATES.md` (exact templates)
+
+**Agents:**
+- `copilot/agents/orchestrator.agent.md` (entry point)
+- `copilot/agents/feature-delivery.agent.md`
+- `copilot/agents/bug-fix.agent.md`
+- `copilot/agents/hotfix.agent.md`
+- `copilot/agents/performance.agent.md`
+- `copilot/agents/spike.agent.md`
+- `copilot/agents/story-refinement.agent.md`
 
 **Specifications:**
-- `copilot/specs/EXECUTION_RULES.md` - Formal enforcement rules
-- `copilot/specs/requirements.md` - System architecture
-- `copilot/specs/EXECUTION_CONTROL.md` - Execution flow specification
+- `copilot/specs/EXECUTION_RULES.md` (formal rules)
+- `copilot/specs/requirements.md` (system architecture)
 
-**User Guides (for reference):**
-- `copilot/instructions/PRACTICAL_GUIDE.md` - Practical examples
-- `copilot/instructions/WORKFLOW_EXECUTION_GUIDE.md` - Comprehensive guide
-- `copilot/instructions/FLAG_USAGE_EXAMPLES.md` - Real-world scenarios
+**Skills:**
+- `copilot/skills/` (30+ reusable capabilities)
+
+---
 
 ## Summary
 
-**Default Behavior:**
-- Autonomous execution (fast, batch processing)
-- Pause only on safety/risk/flag conditions
+### Your Workflow:
+1. Parse flags → Set execution mode
+2. Detect mode → Load appropriate agent
+3. Read agent → Understand process
+4. Execute stages → Batch efficiently
+5. Use templates → Present consistently
+6. Respect rules → Safety first
 
-**With Flags:**
-- User controls checkpoint placement
-- Flexible from full autonomous to step-by-step
+### Key Principles:
+- **Autonomous by default** - Fast execution
+- **Flags for control** - User decides checkpoints
+- **Templates for consistency** - Exact formats
+- **Safety first** - Non-negotiable stops
+- **Batch for performance** - Minimize interruptions
 
-**Always:**
-- Enforce safety rules (non-negotiable)
-- Respect execution flags
-- Present consolidated results
-- Allow mode escalation when needed
+### Success Criteria:
+✅ Correct mode detected
+✅ Flags respected
+✅ Safety rules enforced
+✅ Templates used exactly
+✅ Results clearly presented
+✅ User knows next steps
 
-**Your job:**
-1. Detect mode → Load agent
-2. Parse flags → Configure execution
-3. Execute stages → Batch efficiently
-4. Checkpoint when required → Present clearly
-5. Respect rules → Safety first
+**Execute workflows autonomously. Pause intelligently. Be safe always.**
 
-Execute workflows autonomously. Pause intelligently. Be safe always.
+---
+
+Version: 2.0.0 | Last Updated: 2026-01-18 | Production Ready
