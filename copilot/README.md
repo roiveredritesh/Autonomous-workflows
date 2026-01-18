@@ -1,4 +1,4 @@
-# Autonomous Workflow System - Documentation Index
+# Autonomous Workflow System
 
 ## Overview
 
@@ -10,14 +10,14 @@ This folder contains a complete autonomous workflow system for GitHub Copilot th
 
 **New to the system? Start here:**
 
-1. [PRACTICAL_GUIDE.md](PRACTICAL_GUIDE.md) - **Start here!** Practical examples of how to use the system
-2. [WORKFLOW_EXECUTION_GUIDE.md](WORKFLOW_EXECUTION_GUIDE.md) - Comprehensive execution guide
-3. [FLAG_USAGE_EXAMPLES.md](FLAG_USAGE_EXAMPLES.md) - Real-world examples with different flags
+1. [PRACTICAL_GUIDE.md](instructions/PRACTICAL_GUIDE.md) - **Start here!** Practical examples of how to use the system
+2. [WORKFLOW_EXECUTION_GUIDE.md](instructions/WORKFLOW_EXECUTION_GUIDE.md) - Comprehensive execution guide
+3. [FLAG_USAGE_EXAMPLES.md](instructions/FLAG_USAGE_EXAMPLES.md) - Real-world examples with different flags
 
 **Then explore:**
 
-4. [requirements.md](requirements.md) - Complete system requirements and principles
-5. [EXECUTION_CONTROL.md](EXECUTION_CONTROL.md) - Technical specification of execution flow
+4. [requirements.md](specs/requirements.md) - Complete system requirements and principles
+5. [EXECUTION_CONTROL.md](specs/EXECUTION_CONTROL.md) - Technical specification of execution flow
 
 ---
 
@@ -25,7 +25,7 @@ This folder contains a complete autonomous workflow system for GitHub Copilot th
 
 ### Core Concepts
 
-**[requirements.md](requirements.md)**
+**[requirements.md](specs/requirements.md)**
 - System architecture and principles
 - Execution modes (autonomous vs manual)
 - Execution flags specification
@@ -35,7 +35,7 @@ This folder contains a complete autonomous workflow system for GitHub Copilot th
 
 **Purpose:** Understand the "why" behind the system
 
-**[EXECUTION_RULES.md](EXECUTION_RULES.md)** ⚠️ **Critical**
+**[EXECUTION_RULES.md](specs/EXECUTION_RULES.md)** ⚠️ **Critical**
 - Formal enforcement rules
 - Non-negotiable safety constraints
 - Flag validation and conflicts
@@ -48,7 +48,7 @@ This folder contains a complete autonomous workflow system for GitHub Copilot th
 
 ### Execution Control
 
-**[EXECUTION_CONTROL.md](EXECUTION_CONTROL.md)**
+**[EXECUTION_CONTROL.md](specs/EXECUTION_CONTROL.md)**
 - Execution flow diagrams
 - Execution patterns (autonomous, checkpoint, manual)
 - Batch execution strategy
@@ -60,7 +60,7 @@ This folder contains a complete autonomous workflow system for GitHub Copilot th
 
 ---
 
-**[EXECUTION_RULES.md](EXECUTION_RULES.md)** ⚠️ **Critical Reference**
+**[EXECUTION_RULES.md](specs/EXECUTION_RULES.md)** ⚠️ **Critical Reference**
 - 10 categories of enforcement rules
 - Flag validation and conflict resolution
 - Safety rules (non-negotiable)
@@ -76,7 +76,7 @@ This folder contains a complete autonomous workflow system for GitHub Copilot th
 
 ### User Guides
 
-**[PRACTICAL_GUIDE.md](PRACTICAL_GUIDE.md)** ⭐ **Start Here**
+**[PRACTICAL_GUIDE.md](instructions/PRACTICAL_GUIDE.md)** ⭐ **Start Here**
 - Quick start scenarios
 - Common workflows
 - Flag reference card
@@ -88,7 +88,7 @@ This folder contains a complete autonomous workflow system for GitHub Copilot th
 
 ---
 
-**[WORKFLOW_EXECUTION_GUIDE.md](WORKFLOW_EXECUTION_GUIDE.md)**
+**[WORKFLOW_EXECUTION_GUIDE.md](instructions/WORKFLOW_EXECUTION_GUIDE.md)**
 - Execution modes explained
 - Execution flags reference
 - Common workflows
@@ -100,7 +100,7 @@ This folder contains a complete autonomous workflow system for GitHub Copilot th
 
 ---
 
-**[FLAG_USAGE_EXAMPLES.md](FLAG_USAGE_EXAMPLES.md)**
+**[FLAG_USAGE_EXAMPLES.md](instructions/FLAG_USAGE_EXAMPLES.md)**
 - Real-world scenarios with execution flow
 - Flag combinations for different situations
 - Best practices by scenario type
@@ -112,7 +112,7 @@ This folder contains a complete autonomous workflow system for GitHub Copilot th
 
 ### Implementation Details
 
-**[FLAG_PARSER.md](FLAG_PARSER.md)**
+**[FLAG_PARSER.md](specs/FLAG_PARSER.md)**
 - Flag parsing algorithm
 - Flag types and validation
 - Execution context creation
@@ -146,7 +146,7 @@ This folder contains a complete autonomous workflow system for GitHub Copilot th
 
 **Goal:** Understand basic autonomous execution
 
-1. Read: [PRACTICAL_GUIDE.md](PRACTICAL_GUIDE.md) - Quick Start section
+1. Read: [PRACTICAL_GUIDE.md](instructions/PRACTICAL_GUIDE.md) - Quick Start section
 2. Try: Simple feature request with no flags
 3. Review: Output and understand the workflow
 
@@ -163,8 +163,8 @@ Result: Complete plan in 45 seconds
 
 **Goal:** Use execution flags for control
 
-1. Read: [WORKFLOW_EXECUTION_GUIDE.md](WORKFLOW_EXECUTION_GUIDE.md) - Execution Modes section
-2. Read: [FLAG_USAGE_EXAMPLES.md](FLAG_USAGE_EXAMPLES.md) - Examples 1-4
+1. Read: [WORKFLOW_EXECUTION_GUIDE.md](instructions/WORKFLOW_EXECUTION_GUIDE.md) - Execution Modes section
+2. Read: [FLAG_USAGE_EXAMPLES.md](instructions/FLAG_USAGE_EXAMPLES.md) - Examples 1-4
 3. Try: Feature with checkpoint flag
 4. Try: Feature with risk-based pausing
 
@@ -182,8 +182,8 @@ Result: Checkpoint after analysis, then continue
 
 **Goal:** Master all execution patterns
 
-1. Read: [EXECUTION_CONTROL.md](EXECUTION_CONTROL.md) - Complete specification
-2. Read: [FLAG_USAGE_EXAMPLES.md](FLAG_USAGE_EXAMPLES.md) - All examples
+1. Read: [EXECUTION_CONTROL.md](specs/EXECUTION_CONTROL.md) - Complete specification
+2. Read: [FLAG_USAGE_EXAMPLES.md](instructions/FLAG_USAGE_EXAMPLES.md) - All examples
 3. Try: Complex feature with multiple checkpoints
 4. Try: Manual mode for production hotfix
 
@@ -202,9 +202,9 @@ Result: Multiple review points for high-risk work
 
 **Goal:** Understand system architecture and rules
 
-1. Read: [requirements.md](requirements.md) - Complete requirements
-2. Read: [EXECUTION_RULES.md](EXECUTION_RULES.md) - **Formal enforcement rules**
-3. Read: [FLAG_PARSER.md](FLAG_PARSER.md) - Implementation details
+1. Read: [requirements.md](specs/requirements.md) - Complete requirements
+2. Read: [EXECUTION_RULES.md](specs/EXECUTION_RULES.md) - **Formal enforcement rules**
+3. Read: [FLAG_PARSER.md](specs/FLAG_PARSER.md) - Implementation details
 4. Read: All agent specifications in [agents/](agents/)
 5. Customize: Create team-specific flag patterns
 
@@ -214,7 +214,7 @@ Result: Multiple review points for high-risk work
 
 ### Use Case 1: Routine Feature
 
-**Documentation:** [PRACTICAL_GUIDE.md](PRACTICAL_GUIDE.md) - Scenario 1
+**Documentation:** [PRACTICAL_GUIDE.md](instructions/PRACTICAL_GUIDE.md) - Scenario 1
 
 **Pattern:**
 ```
@@ -227,7 +227,7 @@ Checkpoints: 0
 
 ### Use Case 2: Complex Feature
 
-**Documentation:** [WORKFLOW_EXECUTION_GUIDE.md](WORKFLOW_EXECUTION_GUIDE.md) - Workflow 2
+**Documentation:** [WORKFLOW_EXECUTION_GUIDE.md](instructions/WORKFLOW_EXECUTION_GUIDE.md) - Workflow 2
 
 **Pattern:**
 ```
@@ -240,7 +240,7 @@ Checkpoints: 1 (after analysis)
 
 ### Use Case 3: Performance Optimization
 
-**Documentation:** [FLAG_USAGE_EXAMPLES.md](FLAG_USAGE_EXAMPLES.md) - Example 3
+**Documentation:** [FLAG_USAGE_EXAMPLES.md](instructions/FLAG_USAGE_EXAMPLES.md) - Example 3
 
 **Pattern:**
 ```
@@ -253,7 +253,7 @@ Checkpoints: 0-1 (risk-based)
 
 ### Use Case 4: Production Hotfix
 
-**Documentation:** [FLAG_USAGE_EXAMPLES.md](FLAG_USAGE_EXAMPLES.md) - Example 5
+**Documentation:** [FLAG_USAGE_EXAMPLES.md](instructions/FLAG_USAGE_EXAMPLES.md) - Example 5
 
 **Pattern:**
 ```
@@ -514,14 +514,16 @@ approve_at_risk: medium
 
 ```
 copilot/
-├── INDEX.md (this file)
-├── requirements.md (system requirements)
-├── EXECUTION_RULES.md (enforcement rules - critical)
-├── EXECUTION_CONTROL.md (execution specification)
-├── PRACTICAL_GUIDE.md (practical usage guide)
-├── WORKFLOW_EXECUTION_GUIDE.md (comprehensive guide)
-├── FLAG_USAGE_EXAMPLES.md (real-world examples)
-├── FLAG_PARSER.md (implementation details)
+├── README.md (this file - main navigation)
+├── instructions/ (user-facing guides)
+│   ├── PRACTICAL_GUIDE.md (practical usage guide)
+│   ├── WORKFLOW_EXECUTION_GUIDE.md (comprehensive guide)
+│   └── FLAG_USAGE_EXAMPLES.md (real-world examples)
+├── specs/ (formal specifications)
+│   ├── requirements.md (system requirements)
+│   ├── EXECUTION_RULES.md (enforcement rules - critical)
+│   ├── EXECUTION_CONTROL.md (execution specification)
+│   └── FLAG_PARSER.md (implementation details)
 ├── agents/
 │   ├── orchestrator.agent.md
 │   ├── feature-delivery.agent.md
@@ -532,8 +534,7 @@ copilot/
 │   └── story-refinement.agent.md
 └── skills/
     ├── README.md
-    ├── [30+ skill definitions]
-    └── ...
+    └── [30+ skill definitions]
 ```
 
 ---
@@ -542,13 +543,13 @@ copilot/
 
 ### Key Documents
 
-1. **[PRACTICAL_GUIDE.md](PRACTICAL_GUIDE.md)** - Start here for practical usage
-2. **[WORKFLOW_EXECUTION_GUIDE.md](WORKFLOW_EXECUTION_GUIDE.md)** - Comprehensive execution guide
-3. **[FLAG_USAGE_EXAMPLES.md](FLAG_USAGE_EXAMPLES.md)** - Real-world examples
-4. **[requirements.md](requirements.md)** - System architecture and requirements
-5. **[EXECUTION_RULES.md](EXECUTION_RULES.md)** - **Formal enforcement rules (critical)**
-6. **[EXECUTION_CONTROL.md](EXECUTION_CONTROL.md)** - Technical specification
-7. **[FLAG_PARSER.md](FLAG_PARSER.md)** - Implementation reference
+1. **[PRACTICAL_GUIDE.md](instructions/PRACTICAL_GUIDE.md)** - Start here for practical usage
+2. **[WORKFLOW_EXECUTION_GUIDE.md](instructions/WORKFLOW_EXECUTION_GUIDE.md)** - Comprehensive execution guide
+3. **[FLAG_USAGE_EXAMPLES.md](instructions/FLAG_USAGE_EXAMPLES.md)** - Real-world examples
+4. **[requirements.md](specs/requirements.md)** - System architecture and requirements
+5. **[EXECUTION_RULES.md](specs/EXECUTION_RULES.md)** - **Formal enforcement rules (critical)**
+6. **[EXECUTION_CONTROL.md](specs/EXECUTION_CONTROL.md)** - Technical specification
+7. **[FLAG_PARSER.md](specs/FLAG_PARSER.md)** - Implementation reference
 
 ### Key Concepts
 
