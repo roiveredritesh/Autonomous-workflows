@@ -35,6 +35,15 @@ This folder contains a complete autonomous workflow system for GitHub Copilot th
 
 **Purpose:** Understand the "why" behind the system
 
+**[EXECUTION_RULES.md](EXECUTION_RULES.md)** ⚠️ **Critical**
+- Formal enforcement rules
+- Non-negotiable safety constraints
+- Flag validation and conflicts
+- Risk assessment formulas
+- Escalation conditions
+
+**Purpose:** Understand the "must" and "must not" rules
+
 ---
 
 ### Execution Control
@@ -48,6 +57,20 @@ This folder contains a complete autonomous workflow system for GitHub Copilot th
 - Performance characteristics
 
 **Purpose:** Technical deep-dive into how execution works
+
+---
+
+**[EXECUTION_RULES.md](EXECUTION_RULES.md)** ⚠️ **Critical Reference**
+- 10 categories of enforcement rules
+- Flag validation and conflict resolution
+- Safety rules (non-negotiable)
+- Stage transition requirements
+- Mandatory checkpoint triggers
+- Risk assessment rules
+- Escalation conditions
+- Rule enforcement matrix
+
+**Purpose:** Define non-negotiable rules that govern all execution
 
 ---
 
@@ -177,12 +200,13 @@ Result: Multiple review points for high-risk work
 
 ### Level 4: Expert (2+ hours)
 
-**Goal:** Understand system architecture
+**Goal:** Understand system architecture and rules
 
 1. Read: [requirements.md](requirements.md) - Complete requirements
-2. Read: [FLAG_PARSER.md](FLAG_PARSER.md) - Implementation details
-3. Read: All agent specifications in [agents/](agents/)
-4. Customize: Create team-specific flag patterns
+2. Read: [EXECUTION_RULES.md](EXECUTION_RULES.md) - **Formal enforcement rules**
+3. Read: [FLAG_PARSER.md](FLAG_PARSER.md) - Implementation details
+4. Read: All agent specifications in [agents/](agents/)
+5. Customize: Create team-specific flag patterns
 
 ---
 
@@ -492,6 +516,7 @@ approve_at_risk: medium
 copilot/
 ├── INDEX.md (this file)
 ├── requirements.md (system requirements)
+├── EXECUTION_RULES.md (enforcement rules - critical)
 ├── EXECUTION_CONTROL.md (execution specification)
 ├── PRACTICAL_GUIDE.md (practical usage guide)
 ├── WORKFLOW_EXECUTION_GUIDE.md (comprehensive guide)
@@ -521,7 +546,9 @@ copilot/
 2. **[WORKFLOW_EXECUTION_GUIDE.md](WORKFLOW_EXECUTION_GUIDE.md)** - Comprehensive execution guide
 3. **[FLAG_USAGE_EXAMPLES.md](FLAG_USAGE_EXAMPLES.md)** - Real-world examples
 4. **[requirements.md](requirements.md)** - System architecture and requirements
-5. **[EXECUTION_CONTROL.md](EXECUTION_CONTROL.md)** - Technical specification
+5. **[EXECUTION_RULES.md](EXECUTION_RULES.md)** - **Formal enforcement rules (critical)**
+6. **[EXECUTION_CONTROL.md](EXECUTION_CONTROL.md)** - Technical specification
+7. **[FLAG_PARSER.md](FLAG_PARSER.md)** - Implementation reference
 
 ### Key Concepts
 
