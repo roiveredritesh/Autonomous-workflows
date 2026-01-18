@@ -8,16 +8,21 @@ This folder contains a complete autonomous workflow system for GitHub Copilot th
 
 ## Quick Start
 
+**Integrating with your project? Start here:**
+
+1. [INTEGRATION_GUIDE.md](INTEGRATION_GUIDE.md) - ⭐ **How to add to your existing `.github/copilot-instructions.md`**
+2. [COPILOT_INTEGRATION.md](COPILOT_INTEGRATION.md) - Full autonomous workflow instructions for Copilot
+
 **New to the system? Start here:**
 
-1. [PRACTICAL_GUIDE.md](instructions/PRACTICAL_GUIDE.md) - **Start here!** Practical examples of how to use the system
-2. [WORKFLOW_EXECUTION_GUIDE.md](instructions/WORKFLOW_EXECUTION_GUIDE.md) - Comprehensive execution guide
-3. [FLAG_USAGE_EXAMPLES.md](instructions/FLAG_USAGE_EXAMPLES.md) - Real-world examples with different flags
+3. [instructions/PRACTICAL_GUIDE.md](instructions/PRACTICAL_GUIDE.md) - Practical examples of how to use the system
+4. [instructions/WORKFLOW_EXECUTION_GUIDE.md](instructions/WORKFLOW_EXECUTION_GUIDE.md) - Comprehensive execution guide
+5. [instructions/FLAG_USAGE_EXAMPLES.md](instructions/FLAG_USAGE_EXAMPLES.md) - Real-world examples with different flags
 
 **Then explore:**
 
-4. [requirements.md](specs/requirements.md) - Complete system requirements and principles
-5. [EXECUTION_CONTROL.md](specs/EXECUTION_CONTROL.md) - Technical specification of execution flow
+6. [specs/requirements.md](specs/requirements.md) - Complete system requirements and principles
+7. [specs/EXECUTION_CONTROL.md](specs/EXECUTION_CONTROL.md) - Technical specification of execution flow
 
 ---
 
@@ -515,11 +520,15 @@ approve_at_risk: medium
 ```
 copilot/
 ├── README.md (this file - main navigation)
+├── INTEGRATION_GUIDE.md (how to add to your existing copilot-instructions.md)
+├── COPILOT_INTEGRATION.md (full autonomous workflow instructions)
 ├── instructions/ (user-facing guides)
+│   ├── README.md (instructions index)
 │   ├── PRACTICAL_GUIDE.md (practical usage guide)
 │   ├── WORKFLOW_EXECUTION_GUIDE.md (comprehensive guide)
 │   └── FLAG_USAGE_EXAMPLES.md (real-world examples)
 ├── specs/ (formal specifications)
+│   ├── README.md (specs index)
 │   ├── requirements.md (system requirements)
 │   ├── EXECUTION_RULES.md (enforcement rules - critical)
 │   ├── EXECUTION_CONTROL.md (execution specification)
