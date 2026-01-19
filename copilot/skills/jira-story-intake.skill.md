@@ -1,248 +1,208 @@
-# JIRA Story Intake Skill
+---
+skill: jira-story-intake
+version: 2.0.0
+category: validation
+complexity: low
+estimated_time: 30-60 seconds
+priority: high
+last_updated: 2026-01-18
+---
+
+# JIRA Story Intake
+
+## Quick Example
+
+**Input:** Ticket CUST-2451 "Add Excel export to customer list"
+**Output:** Valid ticket, partial criteria, 3 gaps identified → Proceed to requirements
+**Time:** 40 seconds
+
+---
 
 ## Purpose
 Validates and extracts essential information from JIRA tickets to establish a clear baseline for feature delivery.
 
-## Input Requirements
+## Input
+
 ```yaml
 intake:
-  jira_ticket_id: <PROJ-1234>  # Can be null if creating new
+  jira_ticket_id: <PROJ-1234 or null>
   story_summary: <title>
-  description: <detailed description>
-  acceptance_criteria: [<existing criteria if any>]
-  created_by: <requester name>
+  description: <details>
+  acceptance_criteria: [<if any>]
 ```
 
-## Processing Steps
-
-1. **Ticket Validation**
-   - Does ticket exist in JIRA?
-   - If not, can it be created?
-   - Is ticket in development workflow?
-
-2. **Extract Essential Information**
-   - User story summary
-   - Business context
-   - Existing acceptance criteria
-   - Any constraints or dependencies
-
-3. **Identify Missing Information**
-   - Is acceptance criteria complete?
-   - Is business context clear?
-   - Are dependencies documented?
-
-4. **Document Baseline**
-   - Establish starting point
-   - Record original request
-   - Note any gaps for refinement
-
-## Output Format
+## Output
 
 ```yaml
 intake_result:
-  status: <valid|needs_clarification|created|not_found>
-  
+  status: valid|needs_clarification|created|not_found
+
   ticket_info:
     jira_id: <PROJ-1234>
     title: <story title>
-    url: <JIRA URL>
-    created_date: <date>
-    created_by: <user>
-    status: <Open|In Progress|Ready>
-  
+    priority: critical|high|medium|low
+
   business_context:
-    summary: <business problem being solved>
-    value: <business value delivered>
-    priority: <critical|high|medium|low>
-    stakeholder: <who requested this>
-  
+    summary: <problem being solved>
+    value: <business benefit>
+    stakeholder: <who requested>
+
   current_acceptance_criteria:
-    exists: <yes|no>
-    criteria: [<list if exists>]
-    completeness: <complete|partial|missing>
-  
-  dependencies:
-    internal: [<list of dependent stories>]
-    external: [<list of external dependencies>]
-  
-  gaps_identified: [<items needing clarification>]
-  
-  next_steps:
-    - "Expand acceptance criteria"
-    - "Clarify dependencies"
-    - "Estimate effort"
-  
+    exists: yes|no
+    criteria: [<list>]
+    completeness: complete|partial|missing
+
+  gaps_identified: [<clarifications needed>]
+
   recommendation:
-    action: <proceed_to_requirement_clarity|request_clarification|create_ticket>
-    reason: <brief explanation>
+    action: proceed|request_clarification|create_ticket
+    reason: <explanation>
+
+  confidence: HIGH|MEDIUM|LOW
 ```
 
-## Examples
+## DO:
+✅ Validate ticket exists or can be created
+✅ Extract business context and value
+✅ Document existing acceptance criteria
+✅ Identify gaps requiring clarification
+✅ Capture dependencies
+✅ Establish clear baseline
 
-### Example 1: Valid Ticket with Good Information
-```yaml
-Input:
-  jira_ticket_id: "CUST-2451"
-  story_summary: "Add export to Excel for customer list"
+## DON'T:
+❌ Proceed with invalid or missing tickets
+❌ Skip gap identification
+❌ Assume missing information
+❌ Ignore business context
+❌ Overlook dependencies
 
-Output:
-  status: valid
-  ticket_info:
-    jira_id: "CUST-2451"
-    title: "Add export to Excel for customer list"
-    priority: "high"
-    created_by: "Business Analyst"
-  
-  business_context:
-    summary: "Sales team needs to export customer data for external reporting"
-    value: "Saves 2 hours per week in manual export"
-    priority: "high"
-  
-  current_acceptance_criteria:
-    exists: yes
-    criteria:
-      - "Export button visible on customer list page"
-      - "Export includes name, email, city, state"
-      - "File format: .xlsx"
-      - "Respects applied filters"
-    completeness: "partial"
-  
-  gaps_identified:
-    - "Maximum rows not specified"
-    - "Error handling for large exports not defined"
-    - "Performance expectations missing"
-  
-  recommendation:
-    action: "proceed_to_requirement_clarity"
-    reason: "Valid ticket with core requirements, gaps can be clarified in next stage"
+## Error Conditions
+
+**IF ticket not found:**
+```
+1. Check if ticket ID valid
+2. Attempt to create new ticket
+3. If creation fails:
+   - Return status: not_found
+   - Request valid ticket or creation permission
 ```
 
-### Example 2: Ticket Needs Clarification
-```yaml
-Input:
-  jira_ticket_id: "CUST-2478"
-  story_summary: "Improve performance"
-
-Output:
-  status: needs_clarification
-  ticket_info:
-    jira_id: "CUST-2478"
-    title: "Improve performance"
-    priority: "medium"
-  
-  business_context:
-    summary: "System is slow in some areas"
-    value: "Better user experience"
-  
-  current_acceptance_criteria:
-    exists: no
-    completeness: missing
-  
-  gaps_identified:
-    - "Which specific pages/features are slow?"
-    - "What is current performance baseline?"
-    - "What is target performance?"
-    - "Which users are affected?"
-    - "Business impact of slow performance?"
-  
-  recommendation:
-    action: "request_clarification"
-    reason: "Story is too vague - needs specific problem definition"
-    clarification_needed:
-      - "Identify specific slow functionality"
-      - "Provide performance metrics"
-      - "Specify target performance"
+**IF critical information missing:**
+```
+1. Flag as needs_clarification
+2. List specific gaps:
+   - Missing business context
+   - No acceptance criteria
+   - Unclear problem definition
+3. Recommend: request_clarification
+4. Provide template for stakeholder
 ```
 
-### Example 3: Create New Ticket
-```yaml
-Input:
-  jira_ticket_id: null
-  story_summary: "Add customer segment field to profiles"
+## Status Values
 
-Output:
-  status: created
-  ticket_info:
-    jira_id: "CUST-2512"
-    title: "Add customer segment field to profiles"
-    url: "https://jira.company.com/browse/CUST-2512"
-  
-  business_context:
-    summary: "Support customer segmentation for targeted marketing"
-    value: "Enable data-driven marketing campaigns"
-    priority: "high"
-  
-  current_acceptance_criteria:
-    exists: no
-    completeness: missing
-  
-  gaps_identified:
-    - "All acceptance criteria need to be generated"
-    - "Segment options/values not defined"
-    - "Reporting requirements unclear"
-  
-  recommendation:
-    action: "proceed_to_requirement_clarity"
-    reason: "New ticket created, ready for detailed requirement definition"
+### valid
+- Ticket exists
+- Has core information
+- Can proceed (gaps addressable)
+
+### needs_clarification
+- Too vague or incomplete
+- Missing critical context
+- Requires stakeholder input
+
+### created
+- New ticket created successfully
+- Needs requirements definition
+
+### not_found
+- Ticket doesn't exist
+- Cannot create ticket
+- Invalid ticket ID
+
+## Example 1: Valid Ticket
+
+**Input:**
+```yaml
+jira_ticket_id: "CUST-2451"
+story_summary: "Add Excel export to customer list"
+```
+
+**Output:**
+```yaml
+status: valid
+ticket_info:
+  jira_id: "CUST-2451"
+  title: "Add Excel export to customer list"
+  priority: high
+
+business_context:
+  summary: "Sales team needs customer data for external reporting"
+  value: "Saves 2 hours/week in manual export"
+  stakeholder: "Business Analyst"
+
+current_acceptance_criteria:
+  exists: yes
+  criteria:
+    - "Export button on customer list page"
+    - "Export includes name, email, city, state"
+    - "File format: .xlsx"
+    - "Respects applied filters"
+  completeness: partial
+
+gaps_identified:
+  - "Maximum rows not specified"
+  - "Error handling for large exports not defined"
+  - "Performance expectations missing"
+
+recommendation:
+  action: proceed
+  reason: "Valid ticket with core requirements, gaps addressable"
+confidence: HIGH
+```
+
+## Example 2: Needs Clarification
+
+**Input:**
+```yaml
+jira_ticket_id: "CUST-2478"
+story_summary: "Improve performance"
+```
+
+**Output:**
+```yaml
+status: needs_clarification
+ticket_info:
+  jira_id: "CUST-2478"
+  title: "Improve performance"
+  priority: medium
+
+gaps_identified:
+  - "Which specific pages/features are slow?"
+  - "What is current performance baseline?"
+  - "What is target performance?"
+  - "Which users affected?"
+  - "Business impact?"
+
+recommendation:
+  action: request_clarification
+  reason: "Too vague - needs specific problem definition"
+confidence: LOW
 ```
 
 ## Validation Checklist
 
-- [ ] JIRA ticket exists or can be created
-- [ ] Ticket has clear title and summary
-- [ ] Business context is documented
-- [ ] Priority is assigned
-- [ ] Acceptance criteria exist (or will be created)
-- [ ] Dependencies are identified
-- [ ] Stakeholder is identifiable
+Before proceeding:
+- [ ] Ticket exists or created
+- [ ] Clear title and summary
+- [ ] Business context documented
+- [ ] Priority assigned
+- [ ] Acceptance criteria exist or planned
+- [ ] Dependencies identified
+- [ ] Stakeholder identifiable
 
-## Information to Extract
+---
 
-### Required
-- Story title/summary
-- Business context (why we're doing this)
-- Business value/benefit
-- Priority level
-
-### Strongly Recommended
-- Acceptance criteria (or placeholder)
-- Known dependencies
-- Affected systems/pages
-- Constraints (technical, regulatory, etc.)
-
-### Optional but Helpful
-- Original requester
-- Target timeline
-- Related tickets
-- Mockups or examples
-
-## JIRA Ticket Template
-
-For new tickets, ensure they contain:
-
-```
-Summary: Clear, action-oriented title
-
-Description:
-As a [user role]
-I want to [capability]
-So that [business value]
-
-Acceptance Criteria:
-- [ ] Criterion 1
-- [ ] Criterion 2
-- [ ] Criterion 3
-
-Business Value:
-[Why this matters]
-
-Priority: [High|Medium|Low]
-
-Dependencies:
-[Other stories or systems]
-```
-
-## Related Skills
+**Related Skills:**
 - `acceptance-criteria-expander` - Expands criteria
-- `requirement-extractor` - Extracts requirements
-- `spike-charter` - Creates investigation ticket
+- `requirement-extractor` - Extracts detailed requirements
+- `story-analyzer` - Analyzes story completeness
