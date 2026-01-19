@@ -1,63 +1,84 @@
-# Telerik Impact Checker Skill
+---
+skill: telerik-impact-checker
+version: 2.0.0
+category: validation
+complexity: low
+estimated_time: 30-90 seconds
+priority: high
+last_updated: 2026-01-18
+---
+
+# Telerik Impact Checker
+
+## Quick Example
+
+**Input:** Change RadGrid binding from server to AJAX
+**Output:** Compatible with workaround - preserve ViewState settings
+**Time:** 60 seconds
+
+---
 
 ## Purpose
-Validates that proposed changes are compatible with Telerik controls and won't break their behavior.
+Validates that proposed changes are compatible with Telerik controls and won't break their behavior or contracts.
 
-## Input Requirements
+## Input
+
 ```yaml
 change:
   description: <what's changing>
   affected_controls: [<Telerik control types>]
   control_methods: [<methods being called>]
-  data_bindings: [<binding points>]
 ```
 
-## Processing Steps
-
-1. **Identify Telerik Controls**
-   - What Telerik controls are involved?
-   - What versions in use?
-
-2. **Check Control Lifecycle**
-   - Does change affect initialization?
-   - Does change affect binding?
-   - Does change affect events?
-
-3. **Validate Data Binding**
-   - Is binding pattern preserved?
-   - Are binding expressions valid?
-
-4. **Assess Compatibility**
-   - Is change compatible?
-   - Any known limitations?
-
-## Output Format
+## Output
 
 ```yaml
-telerik_impact_assessment:
-  
+telerik_impact:
+  compatible: yes|no|with_workaround
+
   controls_involved:
-    - control_name: <control>
-      control_type: <RadGrid|RadComboBox|etc>
-      version: <version>
-      risk: <low|medium|high>
-  
-  compatibility_analysis:
-    compatible: <yes|no|with_workaround>
-    blockers: [<if incompatible>]
-    limitations: [<known limitations>]
-  
-  binding_impact:
-    binding_type: <server_binding|client_binding|ajax>
-    change_affects_binding: <yes|no>
-    binding_broken: <yes|no>
-  
-  recommendations:
-    approach: <recommended approach>
-    workarounds: [<if needed>]
-    testing_needed: [<what to test>]
+    - control: <RadGrid|RadComboBox|etc>
+      risk: LOW|MEDIUM|HIGH
+
+  blockers: [<if incompatible>]
+  workarounds: [<if needed>]
+  testing_needed: [<what to test>]
+
+  confidence: HIGH|MEDIUM|LOW
 ```
 
-## Related Skills
-- `webforms-lifecycle-analyzer` - For lifecycle issues
-- `safe-change-boundary-detector` - For safe modification areas
+## DO:
+✅ Check Telerik control lifecycle
+✅ Validate data binding patterns
+✅ Verify event handlers intact
+✅ Test with Telerik version in use
+✅ Document any workarounds
+
+## DON'T:
+❌ Break Telerik control contracts
+❌ Change binding without validation
+❌ Skip lifecycle checks
+❌ Ignore known limitations
+
+## Common Telerik Constraints
+
+### RadGrid
+- Requires ViewState for state management
+- Binding changes affect pagination
+- AJAX updates need UpdatePanel
+
+### RadComboBox
+- Server binding vs client binding
+- LoadOnDemand affects lifecycle
+- Item templates must preserve structure
+
+### RadEditor
+- Content area modification restricted
+- Toolbar customization specific API
+- Client-side content access patterns
+
+---
+
+**Related Skills:**
+- `webforms-lifecycle-analyzer` - Lifecycle validation
+- `safe-change-boundary-detector` - Safe modifications

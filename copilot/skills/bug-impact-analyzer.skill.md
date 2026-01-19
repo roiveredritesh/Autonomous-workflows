@@ -1,78 +1,78 @@
-# Bug Impact Analyzer Skill
+---
+skill: bug-impact-analyzer
+version: 2.0.0
+category: analysis
+complexity: low
+estimated_time: 1-2 minutes
+priority: high
+last_updated: 2026-01-18
+---
+
+# Bug Impact Analyzer
+
+## Quick Example
+
+**Input:** Customer search returns wrong results
+**Output:** 200 users affected, data integrity safe, business impact HIGH → Expedite
+**Time:** 90 seconds
+
+---
 
 ## Purpose
-Assesses the scope and impact of a bug to understand who is affected and how severely.
+Assesses scope and impact of bugs on users, data, and business operations to prioritize response.
 
-## Input Requirements
+## Input
+
 ```yaml
 bug:
   description: <bug description>
-  affected_feature: <feature>
-  reproduction_steps: [<steps>]
-  environment: <prod|staging|dev>
-  first_reported: <when>
+  affected_feature: <feature/page>
+  environment: production|staging|dev
 ```
 
-## Processing Steps
-
-1. **User Impact Assessment**
-   - Who is affected?
-   - How many users?
-   - What can't they do?
-
-2. **Data Impact Assessment**
-   - Is data being corrupted?
-   - Is data being lost?
-   - Is data integrity at risk?
-
-3. **System Impact Assessment**
-   - Performance impact?
-   - Availability impact?
-   - Cascading failures?
-
-4. **Scope Analysis**
-   - Just one feature or multiple?
-   - Just one page or multiple?
-   - Just one user type or multiple?
-
-## Output Format
+## Output
 
 ```yaml
 impact_assessment:
-  
   user_impact:
-    estimated_affected_users: <count|percentage>
-    user_types_affected: [<types>]
-    what_they_cannot_do: [<functionality>]
-    severity_per_user: <high|medium|low>
-  
+    affected_users: <count or %>
+    severity_per_user: HIGH|MEDIUM|LOW
+    workaround_available: yes|no
+
   data_impact:
-    data_at_risk: <none|being_lost|corrupted|exposed>
-    scope: <single_record|multiple|all>
-    recovery_possible: <yes|no|with_effort>
-  
-  system_impact:
-    performance_affected: <yes|no|degraded>
-    availability_affected: <yes|no>
-    cascading_failures: <yes|no>
-  
-  scope_analysis:
-    affected_features: [<list>]
-    affected_pages: [<list>]
-    affected_modules: [<list>]
-    scope_estimate: <single_component|multiple|application_wide>
-  
+    data_at_risk: none|corrupted|lost|exposed
+    recovery_possible: yes|no|with_effort
+
   business_impact:
-    revenue_impact: <none|minimal|moderate|severe>
-    customer_facing: <yes|no>
-    workaround_exists: <yes|no>
-  
-  priority_assessment:
-    urgency: <immediate|urgent|soon|defer>
-    impact_score: <1-10>
-    recommendation: <hotfix|expedited_fix|standard|defer>
+    revenue_impact: none|minimal|moderate|severe
+    customer_facing: yes|no
+
+  scope:
+    affected_features: [<list>]
+    scope_estimate: single|multiple|wide
+
+  urgency: IMMEDIATE|URGENT|SOON|DEFER
+  recommendation: hotfix|expedited|standard|defer
+
+  confidence: HIGH|MEDIUM|LOW
 ```
 
-## Related Skills
-- `bug-classifier` - Classifies bug severity
-- `production-impact-assessor` - For production assessment
+## DO:
+✅ Assess actual user count
+✅ Check data corruption/loss
+✅ Evaluate business impact
+✅ Identify workarounds
+✅ Determine urgency
+
+## DON'T:
+❌ Underestimate user impact
+❌ Ignore data integrity
+❌ Overlook revenue impact
+❌ Skip workaround check
+
+---
+
+**Related Skills:**
+- `bug-classifier` - Categorizes bug
+- `production-impact-assessor` - Production severity
+- `minimal-fix-planner` - Plans fix
