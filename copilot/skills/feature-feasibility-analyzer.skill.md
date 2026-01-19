@@ -1,244 +1,276 @@
-# Feature Feasibility Analyzer Skill
+---
+skill: feature-feasibility-analyzer
+version: 2.0.0
+category: analysis
+complexity: medium
+estimated_time: 2-3 minutes
+priority: high
+last_updated: 2026-01-18
+---
+
+# Feature Feasibility Analyzer
+
+## Quick Example
+
+**Input:** "Add real-time chat to customer portal"
+**Output:** LOW feasibility - WebForms incompatible, HIGH risk → Recommend spike
+**Time:** 2 minutes
+
+---
 
 ## Purpose
 Evaluates technical and business feasibility of proposed features in legacy ASP.NET WebForms environment.
 
-## Input Requirements
+## Input
+
 ```yaml
 feature:
   title: <feature name>
   description: <what user wants>
   requirements: [<functional requirements>]
-  constraints: [<technical or business constraints>]
-  timeline: <requested timeline if any>
-  affected_systems: [<systems involved>]
+  constraints: [<limitations>]
+  timeline: <if specified>
 ```
 
-## Processing Steps
-
-1. **Technical Feasibility Assessment**
-   - Can it be done with current technology stack?
-   - WebForms compatibility issues?
-   - Third-party library availability?
-   - Performance implications?
-
-2. **Legacy System Impact**
-   - ViewState implications
-   - Page lifecycle conflicts
-   - Telerik control limitations
-   - Database schema changes needed?
-
-3. **Risk Evaluation**
-   - Data integrity risks
-   - Performance risks
-   - Regression risks
-   - Deployment risks
-
-4. **Complexity Estimation**
-   - Lines of code to change
-   - Modules to modify
-   - Testing effort
-   - Refactoring needed?
-
-5. **Alternative Approaches**
-   - Identify workarounds
-   - Consider phased approach
-   - Evaluate different technical paths
-
-## Output Format
+## Output
 
 ```yaml
 feasibility_assessment:
-  
+  rating: HIGH|MEDIUM|LOW
+
   technical_feasibility:
-    rating: <high|medium|low>
-    reasoning: <explanation>
-    blockers: [<technical blockers if any>]
-    opportunities: [<enablers>]
-  
-  legacy_system_impact:
-    webforms_compatible: <yes|no|with_workaround>
-    viewstate_impact: <none|minor|significant|blocker>
-    lifecycle_issues: [<list if any>]
-    telerik_concerns: [<list if any>]
-  
+    compatible: yes|no|with_workaround
+    blockers: [<technical issues>]
+    enablers: [<what helps>]
+
+  legacy_impact:
+    webforms_compatible: yes|no|partial
+    telerik_compatible: yes|no|partial
+    viewstate_impact: none|low|medium|high
+
   risk_assessment:
-    overall_risk: <low|medium|high|critical>
-    risks:
-      - risk: <description>
-        probability: <high|medium|low>
-        impact: <high|medium|low>
-        mitigation: <how to mitigate>
-  
-  complexity_estimation:
-    estimated_lines_changed: <range>
-    modules_to_modify: [<list>]
-    refactoring_required: <yes|no|maybe>
-    effort_hours: <estimate>
-    testing_effort: <low|medium|high>
-  
-  alternatives_considered:
-    - option: <alternative approach>
-      pros: [<advantages>]
-      cons: [<disadvantages>]
-      recommendation: <why chosen or not>
-  
+    data_integrity: LOW|MEDIUM|HIGH
+    performance: LOW|MEDIUM|HIGH
+    regression: LOW|MEDIUM|HIGH
+    overall_risk: LOW|MEDIUM|HIGH
+
+  complexity:
+    level: LOW|MEDIUM|HIGH
+    estimated_files: <count>
+    estimated_lines: <count>
+
+  alternatives: [<other approaches>]
+
   recommendation:
-    decision: <proceed|proceed_with_mitigations|pivot|spike_first|not_feasible>
-    reasoning: <summary>
-    required_mitigations: [<list if decision is proceed_with_mitigations>]
-    preconditions: [<what needs to be true>]
+    action: proceed|spike|alternative|defer
+    reason: <explanation>
+
+  confidence: HIGH|MEDIUM|LOW
 ```
 
-## Assessment Examples
+## Feasibility Ratings
 
-### Example 1: Low Risk - Straightforward Feature
-```yaml
-Feature: "Add export to Excel button on customer list"
-
-Output:
-  technical_feasibility: high
-  webforms_compatible: yes
-  viewstate_impact: none
-  overall_risk: low
-  estimated_lines: "50-100"
-  modules: ["CustomerList.aspx", "CustomerRepository"]
-  effort: "4-8 hours"
-  recommendation: "Proceed - straightforward feature"
-```
-
-### Example 2: Medium Risk - Database Changes
-```yaml
-Feature: "Add customer segment field for marketing targeting"
-
-Output:
-  technical_feasibility: medium
-  webforms_compatible: yes
-  viewstate_impact: minor
-  overall_risk: medium
-  risks:
-    - risk: "Existing reports must be updated"
-      probability: high
-      impact: medium
-      mitigation: "Include in scope, plan carefully"
-    - risk: "Data migration for existing customers"
-      probability: high
-      impact: medium
-      mitigation: "Script migration, test thoroughly"
-  estimated_lines: "200-400"
-  modules: ["CustomerForm.aspx", "CustomerRepository", "ReportPages"]
-  effort: "20-30 hours"
-  recommendation: "Proceed with careful planning"
-```
-
-### Example 3: High Risk - Architectural Change
-```yaml
-Feature: "Add real-time notifications via SignalR"
-
-Output:
-  technical_feasibility: low
-  webforms_compatible: no (with_workaround)
-  viewstate_impact: significant
-  lifecycle_issues:
-    - "SignalR incompatible with PostBack model"
-    - "Stateful connections vs stateless pages"
-  overall_risk: high
-  blockers:
-    - "Requires architectural changes"
-    - "May need partial UI rewrite"
-    - "Testing complexity increases significantly"
-  recommendation: "Spike first - unknown compatibility issues"
-```
-
-### Example 4: Not Feasible
-```yaml
-Feature: "Switch from synchronous to fully async operations"
-
-Output:
-  technical_feasibility: low
-  webforms_compatible: no
-  lifecycle_issues:
-    - "WebForms designed for synchronous model"
-    - "ViewState serialization complex with async"
-    - "Exception handling differs"
-  overall_risk: critical
-  blockers:
-    - "Would require complete page rewrite"
-    - "Risk of regression in all pages using async"
-    - "No gradual migration path"
-  recommendation: "Not feasible - consider as future architecture initiative, not feature"
-  alternatives:
-    - "Async database calls only (spike first)"
-    - "WebForms to ASPX.NET Core migration (long-term)"
-```
-
-## Risk Categories
-
-### Technical Risks
-- Third-party library incompatibility
-- Performance degradation
-- Scalability concerns
-- Security vulnerabilities
-
-### Legacy System Risks
-- WebForms incompatibility
-- ViewState bloat
-- Page lifecycle violations
-- State management issues
-
-### Data Risks
-- Schema migration complexity
-- Data consistency issues
-- Backward compatibility breaks
-- Rollback complexity
-
-### Integration Risks
-- External service dependencies
-- API compatibility
-- Cache invalidation
-- Concurrent update issues
-
-## Feasibility Levels
-
-### High Feasibility
-- Clear technical path
-- Minimal legacy system impact
+### HIGH - Proceed
+- Compatible with WebForms
 - Low risk
-- Can start immediately
-- **Decision:** Proceed
+- Proven patterns exist
+- Clear implementation path
 
-### Medium Feasibility
-- Some technical challenges
-- Moderate legacy impact
-- Medium risk
-- Needs careful planning
-- **Decision:** Proceed with mitigations
+### MEDIUM - Proceed with Caution
+- Compatible with workarounds
+- Moderate risk
+- Some unknowns
+- May need spike first
 
-### Low Feasibility
-- Significant technical challenges
-- High legacy impact
+### LOW - Spike or Alternative
+- WebForms incompatible
 - High risk
-- Requires investigation
-- **Decision:** Spike first
+- Major unknowns
+- Needs investigation
 
-### Not Feasible
-- Blocking issues
-- Architectural misalignment
-- Critical risks
-- **Decision:** Reject or major refactor
+## DO:
+✅ Assess WebForms compatibility
+✅ Check Telerik limitations
+✅ Evaluate ViewState impact
+✅ Identify risks early
+✅ Suggest alternatives
+✅ Recommend spike if uncertain
 
-## Estimation Framework
+## DON'T:
+❌ Ignore WebForms constraints
+❌ Skip legacy impact analysis
+❌ Underestimate complexity
+❌ Proceed with LOW feasibility
+❌ Overlook performance risks
+❌ Skip alternative approaches
 
-| Aspect | Low | Medium | High | Very High |
-|--------|-----|--------|------|-----------|
-| Lines Changed | <50 | 50-200 | 200-500 | >500 |
-| Modules | 1 | 2-3 | 4-6 | 6+ |
-| Effort Hours | 4-8 | 12-20 | 24-40 | 40+ |
-| Risk Level | Low | Medium | High | Critical |
-| Recommendation | Proceed | Plan | Spike | Don't |
+## Error Conditions
 
-## Related Skills
-- `acceptance-criteria-expander` - Clarifies requirements
-- `spike-charter` - Plans investigation
-- `webforms-lifecycle-analyzer` - Checks page lifecycle impact
-- `minimal-diff-planner` - Plans minimal implementation
+**IF WebForms incompatible:**
+```
+1. Flag as LOW feasibility
+2. Explain incompatibility
+3. Suggest alternatives:
+   - Workaround approach
+   - Alternative technology
+   - Phased migration
+4. Recommend spike investigation
+```
+
+**IF high risk detected:**
+```
+1. Flag specific risks
+2. Recommend mitigation:
+   - Spike investigation
+   - Proof of concept
+   - Phased approach
+3. Document risk factors
+```
+
+## Assessment Criteria
+
+### Technical Feasibility
+- **HIGH:** Standard WebForms patterns
+- **MEDIUM:** Requires custom solution
+- **LOW:** Incompatible with WebForms
+
+### Legacy Compatibility
+- **YES:** Works with ViewState/lifecycle
+- **PARTIAL:** Workarounds needed
+- **NO:** Violates WebForms constraints
+
+### Risk Level
+- **LOW:** Minimal changes, proven patterns
+- **MEDIUM:** Moderate changes, some unknowns
+- **HIGH:** Extensive changes, major unknowns
+
+## Example 1: HIGH Feasibility
+
+**Input:**
+```yaml
+title: "Add Excel export to customer list"
+description: "Users need to export customer data"
+requirements: ["Export filtered results", "XLSX format"]
+```
+
+**Output:**
+```yaml
+rating: HIGH
+
+technical_feasibility:
+  compatible: yes
+  enablers:
+    - "EPPlus library already in use"
+    - "Standard PostBack pattern"
+    - "Existing export examples"
+
+legacy_impact:
+  webforms_compatible: yes
+  telerik_compatible: yes
+  viewstate_impact: none
+
+risk_assessment:
+  data_integrity: LOW
+  performance: LOW
+  regression: LOW
+  overall_risk: LOW
+
+complexity:
+  level: LOW
+  estimated_files: 2
+  estimated_lines: 40
+
+recommendation:
+  action: proceed
+  reason: "Standard pattern, low risk, proven approach"
+confidence: HIGH
+```
+
+## Example 2: LOW Feasibility
+
+**Input:**
+```yaml
+title: "Add real-time chat to customer portal"
+description: "Live chat between customers and support"
+requirements: ["Real-time messaging", "Presence indicators"]
+```
+
+**Output:**
+```yaml
+rating: LOW
+
+technical_feasibility:
+  compatible: no
+  blockers:
+    - "WebForms request/response model incompatible with real-time"
+    - "SignalR difficult to integrate with WebForms lifecycle"
+    - "ViewState conflicts with persistent connections"
+
+legacy_impact:
+  webforms_compatible: no
+  viewstate_impact: high
+
+risk_assessment:
+  overall_risk: HIGH
+
+alternatives:
+  - "Use polling instead of real-time (workaround)"
+  - "Separate SPA page for chat (partial modernization)"
+  - "Third-party chat widget (external integration)"
+  - "Defer until platform migration"
+
+recommendation:
+  action: spike
+  reason: "WebForms incompatible - investigate alternatives"
+confidence: HIGH
+```
+
+## Example 3: MEDIUM Feasibility
+
+**Input:**
+```yaml
+title: "Add async data loading to improve performance"
+description: "Make page load faster with async calls"
+```
+
+**Output:**
+```yaml
+rating: MEDIUM
+
+technical_feasibility:
+  compatible: with_workaround
+  blockers:
+    - "WebForms Page async patterns complex"
+    - "ViewState handling with async tricky"
+  enablers:
+    - "Can use AJAX for partial updates"
+    - "Telerik AJAX controls available"
+
+legacy_impact:
+  webforms_compatible: partial
+  viewstate_impact: medium
+
+risk_assessment:
+  regression: MEDIUM
+  overall_risk: MEDIUM
+
+complexity:
+  level: MEDIUM
+
+alternatives:
+  - "Use Telerik AJAX for partial updates (proven)"
+  - "Full async Page (complex, risky)"
+  - "Client-side loading with API (modern)"
+
+recommendation:
+  action: spike
+  reason: "Multiple approaches - spike to validate best path"
+confidence: MEDIUM
+```
+
+---
+
+**Related Skills:**
+- `webforms-lifecycle-analyzer` - Analyzes WebForms compatibility
+- `telerik-impact-checker` - Checks Telerik limitations
+- `spike-charter` - Creates investigation plan

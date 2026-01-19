@@ -1,311 +1,291 @@
-# Test Scenario Generator Skill
+---
+skill: test-scenario-generator
+version: 2.0.0
+category: generation
+complexity: medium
+estimated_time: 2-3 minutes
+priority: high
+last_updated: 2026-01-18
+---
+
+# Test Scenario Generator
+
+## Quick Example
+
+**Input:** Excel export feature with 4 acceptance criteria
+**Output:** 8 test scenarios (happy path + 4 edge cases) with steps and data
+**Time:** 2 minutes
+
+---
 
 ## Purpose
-Creates comprehensive test scenarios and test cases based on acceptance criteria and edge cases.
+Creates comprehensive test scenarios based on acceptance criteria, covering happy paths, edge cases, and error conditions.
 
-## Input Requirements
+## Input
+
 ```yaml
 feature:
   description: <feature>
   acceptance_criteria: [<criteria>]
   edge_cases: [<edge cases>]
-  user_roles: [<roles>]
-  systems: [<involved systems>]
+  user_roles: [<roles if relevant>]
 ```
 
-## Processing Steps
-
-1. **Map Criteria to Test Scenarios**
-   - One or more scenarios per criterion
-   - Include all paths through feature
-
-2. **Create Test Cases**
-   - Preconditions
-   - Steps
-   - Expected results
-   - Post-conditions
-
-3. **Plan Test Types**
-   - Manual tests
-   - Automated tests
-   - Integration tests
-   - Load tests if needed
-
-4. **Identify Test Data**
-   - What data needed
-   - Valid vs invalid data
-   - Boundary values
-
-## Output Format
+## Output
 
 ```yaml
 test_scenarios:
-  
-  test_scenario_list:
-    - scenario_id: "TS-001"
-      scenario_name: <test scenario name>
-      criterion_covered: <acceptance criterion>
-      
-      preconditions:
-        - <precondition>
-        - <precondition>
-      
-      test_steps:
-        - step_1: <action>
-        - step_2: <action>
-        - step_3: <action>
-      
-      expected_results:
-        - <expected result>
-        - <expected result>
-      
-      test_type: <manual|automated|both>
-      automation_feasibility: <easy|moderate|difficult>
-      test_data_needed:
-        - <data type>
-        - <data type>
-      
-      priority: <critical|high|medium|low>
-    
-    - scenario_id: "TS-002"
-      ...
-  
-  test_data_matrix:
-    valid_data:
-      - <example>
-      - <example>
-    
-    invalid_data:
-      - <example>
-      - <example>
-    
-    boundary_values:
-      - <example>
-      - <example>
-  
-  regression_test_scenarios: [<scenarios to prevent regression>]
-  
-  test_coverage:
-    total_scenarios: <count>
-    happy_path: <count>
-    edge_case: <count>
-    error_handling: <count>
-    coverage_percentage: <estimate>
-  
-  manual_vs_automated:
-    recommended_manual: [<scenarios>]
-    recommended_automated: [<scenarios>]
-    recommended_both: [<scenarios>]
-  
-  test_execution_plan:
-    phase_1: [<scenarios to test first>]
-    phase_2: [<scenarios>]
-    phase_3: [<scenarios>]
+  scenarios:
+    - id: TS-001
+      name: <scenario name>
+      criterion: <which criterion>
+      type: happy_path|edge_case|error_condition
+      priority: critical|high|medium|low
+
+      steps:
+        - <action>
+        - <action>
+
+      expected: [<results>]
+      test_data: [<data needed>]
+
+  coverage:
+    criteria_covered: <count>/<total>
+    edge_cases_covered: <count>/<total>
+
+  test_data_needed:
+    valid: [<examples>]
+    invalid: [<examples>]
+    boundary: [<examples>]
+
+  confidence: HIGH|MEDIUM|LOW
 ```
 
-## Examples
+## Scenario Types
 
-### Example 1: Export Feature Test Scenarios
+### Happy Path
+- User follows expected flow
+- Valid inputs
+- Successful outcome
+- Priority: CRITICAL
+
+### Edge Cases
+- Boundary conditions
+- Unusual but valid inputs
+- Performance limits
+- Priority: HIGH/MEDIUM
+
+### Error Conditions
+- Invalid inputs
+- System errors
+- User errors
+- Priority: MEDIUM/LOW
+
+## DO:
+✅ Cover all acceptance criteria
+✅ Include happy path for each criterion
+✅ Add edge case scenarios
+✅ Include error conditions
+✅ Specify test data needed
+✅ Mark automation feasibility
+✅ Prioritize scenarios
+
+## DON'T:
+❌ Skip any acceptance criteria
+❌ Omit edge cases
+❌ Forget error handling
+❌ Miss boundary conditions
+❌ Leave steps vague
+❌ Skip test data planning
+
+## Error Conditions
+
+**IF acceptance criteria incomplete:**
+```
+1. Flag incomplete criteria
+2. Generate basic scenarios
+3. Note gaps in coverage
+4. Recommend criteria refinement
+```
+
+**IF edge cases missing:**
+```
+1. Infer common edge cases:
+   - Empty/null inputs
+   - Max/min boundaries
+   - Concurrent operations
+   - Timeout scenarios
+2. Note inferred cases
+3. Recommend validation
+```
+
+## Example: Excel Export Feature
+
+**Input:**
 ```yaml
-Test Scenario 1: Basic Export
-  Criterion: "Export button visible and functional"
-  
-  Preconditions:
-    - Customer list page open
-    - At least 5 customers in system
-  
-  Test Steps:
-    1. Navigate to Customer List page
-    2. Click Export button
-    3. Wait for download
-  
-  Expected Results:
-    - Export button visible and clickable
-    - Excel file downloads
-    - File named correctly (CustomerExport_[date].xlsx)
-    - File opens in Excel without errors
-  
-  Test Type: Manual (UI interaction)
-  
-Test Scenario 2: Export with Filters
-  Criterion: "Export respects applied filters"
-  
-  Preconditions:
-    - Customer list with 100+ customers
-    - Status filter: Active
-  
-  Test Steps:
-    1. Apply Status = 'Active' filter
-    2. Verify 30 customers shown
-    3. Click Export
-    4. Open downloaded file
-    5. Count rows
-  
-  Expected Results:
-    - Export contains exactly 30 customers
-    - All customers have Status = Active
-  
-  Test Type: Automated (data verification)
-
-Test Scenario 3: Large Export Warning
-  Criterion: "Warn user when exporting >10,000 rows"
-  
-  Preconditions:
-    - System has 15,000 customers
-  
-  Test Steps:
-    1. Go to Customer List (no filters)
-    2. Click Export
-    3. Observe warning
-  
-  Expected Results:
-    - Warning shown: "This export contains 15,000 records"
-    - User can confirm or cancel
-    - If confirm, export proceeds
-    - If cancel, no export
-  
-  Test Type: Manual + Automated
-  
-Test Scenario 4: Export with No Results
-  Criterion: "Handle empty result set gracefully"
-  
-  Preconditions:
-    - Filter applied: Status = 'Deleted'
-    - No deleted customers exist
-  
-  Test Steps:
-    1. Apply filter
-    2. Verify 'No results' message
-    3. Try to export
-  
-  Expected Results:
-    - Message shown: "No records to export"
-    - Export button disabled or greyed
-    - No file downloads
-  
-  Test Type: Manual
+description: "Add Excel export to customer list"
+acceptance_criteria:
+  - "Export button visible on page"
+  - "Export includes filtered results only"
+  - "File format is .xlsx"
+  - "Max 10,000 rows with warning"
+edge_cases:
+  - "Empty result set"
+  - "Exactly 10,000 rows"
+  - "Over 10,000 rows"
+  - "Export during concurrent operations"
 ```
 
-### Example 2: Form Validation Test Scenarios
+**Output:**
 ```yaml
-Test Scenario 1: Valid Form Submission
-  Preconditions:
-    - Customer form open
-    - All required fields visible
-  
-  Test Steps:
-    1. Fill Name: "John Smith"
-    2. Fill Email: "john@example.com"
-    3. Fill Phone: "(555) 123-4567"
-    4. Click Save
-  
-  Expected Results:
-    - Form submits successfully
-    - Customer record created
-    - Confirmation message shown
-  
-  Test Type: Automated
+scenarios:
+  - id: TS-001
+    name: "Happy path - export filtered results"
+    criterion: "Export includes filtered results"
+    type: happy_path
+    priority: critical
 
-Test Scenario 2: Invalid Email Format
-  Test Steps:
-    1. Fill Name: "John Smith"
-    2. Fill Email: "not-an-email"
-    3. Click Save
-  
-  Expected Results:
-    - Form not submitted
-    - Error message: "Invalid email format"
-    - Email field highlighted
-    - Other data preserved
-  
-  Test Type: Automated
+    steps:
+      - "Navigate to customer list"
+      - "Apply filter: Status = Active"
+      - "Click Export button"
+      - "Download completes"
 
-Test Scenario 3: Duplicate Email
-  Preconditions:
-    - Customer exists with john@example.com
-  
-  Test Steps:
-    1. Create new customer with same email
-    2. Click Save
-  
-  Expected Results:
-    - Form not submitted
-    - Error message: "Email already exists"
-    - Data preserved for retry
-  
-  Test Type: Automated
+    expected:
+      - "Excel file downloads"
+      - "Contains only Active customers"
+      - "All visible columns included"
+      - "File opens in Excel"
 
-Test Scenario 4: Optional Phone Field
-  Test Steps:
-    1. Fill Name, Email
-    2. Leave Phone empty
-    3. Click Save
-  
-  Expected Results:
-    - Form submits
-    - Customer saved with empty phone
-    - No error message
-  
-  Test Type: Automated
+    test_data:
+      - "Database with 500 Active customers"
+      - "Mixed Active/Inactive customers"
+
+  - id: TS-002
+    name: "Export empty result set"
+    criterion: "Export handles no results"
+    type: edge_case
+    priority: high
+
+    steps:
+      - "Apply filter with no matches"
+      - "Click Export button"
+
+    expected:
+      - "Excel file with headers only"
+      - "OR friendly message: 'No data to export'"
+
+    test_data:
+      - "Filter that returns 0 results"
+
+  - id: TS-003
+    name: "Export exactly 10,000 rows"
+    criterion: "Max 10,000 rows limit"
+    type: edge_case
+    priority: high
+
+    steps:
+      - "Filter returns exactly 10,000 customers"
+      - "Click Export"
+
+    expected:
+      - "All 10,000 rows exported"
+      - "NO warning shown"
+
+    test_data:
+      - "Database with 10,000+ customers"
+
+  - id: TS-004
+    name: "Export over 10,000 rows"
+    criterion: "Warning for large export"
+    type: edge_case
+    priority: high
+
+    steps:
+      - "Filter returns 15,000 customers"
+      - "Click Export"
+
+    expected:
+      - "Warning message displayed"
+      - "Only first 10,000 exported"
+      - "OR option to download in batches"
+
+  - id: TS-005
+    name: "Export with timeout"
+    criterion: "Handle export errors"
+    type: error_condition
+    priority: medium
+
+    steps:
+      - "Start export"
+      - "Simulate server timeout"
+
+    expected:
+      - "Error message shown"
+      - "User can retry"
+      - "No partial file downloaded"
+
+coverage:
+  criteria_covered: 4/4
+  edge_cases_covered: 4/4
+
+test_data_needed:
+  valid:
+    - "500 customer records"
+    - "10,000 customer records"
+    - "15,000 customer records"
+  invalid:
+    - "No matching records"
+  boundary:
+    - "Exactly 10,000 records"
+    - "10,001 records"
+
+confidence: HIGH
 ```
 
-## Test Data Template
+## Test Data Matrix
 
-```yaml
-valid_test_data:
-  email:
-    - "user@example.com"
-    - "first.last@company.co.uk"
-    - "user+tag@example.com"
+### Valid Data
+- Typical production-like data
+- Various data types
+- Representative edge cases
 
-invalid_test_data:
-  email:
-    - "not-an-email"
-    - "user@"
-    - "@example.com"
-    - "user space@example.com"
+### Invalid Data
+- Null/empty values
+- Wrong types
+- Out of range values
+- Special characters
 
-boundary_values:
-  customer_count:
-    - 0 (empty list)
-    - 1 (single item)
-    - 9,999 (just below limit)
-    - 10,000 (at limit)
-    - 10,001 (just over limit)
-```
+### Boundary Data
+- Minimum values
+- Maximum values
+- Just below/above limits
 
-## Test Type Definitions
+## Prioritization
 
-**Manual Tests:**
-- UI interactions
-- User experience
-- Visual verification
-- Complex workflows
+### Critical
+- Happy path for core functionality
+- Data corruption risks
+- Security scenarios
 
-**Automated Tests:**
-- Data validation
-- Calculations
-- Database operations
-- Performance thresholds
+### High
+- Common edge cases
+- Performance limits
+- User-facing errors
 
-**Integration Tests:**
-- Multiple components
-- System interactions
-- External service calls
+### Medium
+- Rare edge cases
+- Non-critical errors
+- Recovery scenarios
 
-**Load Tests:**
-- Performance under load
-- Concurrent operations
-- Resource limits
+### Low
+- Cosmetic issues
+- Documentation validation
+- Nice-to-have validations
 
-## Coverage Goals
+---
 
-- Happy path: 100%
-- Edge cases: 80%+
-- Error handling: 80%+
-- Overall: 90%+ criterion coverage
-
-## Related Skills
-- `acceptance-criteria-expander` - Defines criteria to test
-- `edge-case-detector` - Identifies edge cases to test
-- `webforms-regression-analyzer` - For regression testing
+**Related Skills:**
+- `acceptance-criteria-expander` - Expands criteria for testing
+- `edge-case-detector` - Identifies edge cases
+- `webforms-regression-analyzer` - Identifies regression scenarios
