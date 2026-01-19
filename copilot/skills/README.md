@@ -1,5 +1,20 @@
 # Skills Inventory & Reference
 
+## 🎯 Standardization Status (NEW!)
+
+Skills are being upgraded to **v2.0.0 standard** with YAML frontmatter, quick examples, DO/DON'T lists, and error handling.
+
+**Progress:** 3/28 skills standardized (11%)
+- ✅ `bug-classifier` - v2.0.0 (334→179 lines)
+- ✅ `production-impact-assessor` - v2.0.0 (152→157 lines)
+- ✅ `safe-change-boundary-detector` - v2.0.0 (80→216 lines)
+
+**See:** `STANDARDIZATION_SUMMARY.md` for details and `SKILL_TEMPLATE.md` for standard format.
+
+**Remaining:** 25 skills scheduled for incremental standardization.
+
+---
+
 ## Complete Skills List (28 Skills)
 
 ### Story & Requirements Skills (6)

@@ -1,79 +1,215 @@
-# Safe Change Boundary Detector Skill
+---
+skill: safe-change-boundary-detector
+version: 2.0.0
+category: validation
+complexity: medium
+estimated_time: 1-2 minutes
+priority: critical
+last_updated: 2026-01-18
+---
+
+# Safe Change Boundary Detector
+
+## Quick Example
+
+**Input:** Modify `CustomerList.aspx.cs` - add export method
+**Output:** Safe: Add new private method | Unsafe: Change public interface
+**Time:** 90 seconds
+
+---
 
 ## Purpose
-Identifies safe modification points in legacy WebForms code where changes can be made without breaking other functionality.
+Identifies safe modification points in legacy WebForms code where changes won't break existing functionality or violate public contracts.
 
-## Input Requirements
+## Input
+
 ```yaml
 change_scope:
   file_path: <file to modify>
   method_name: <method being changed>
-  change_type: <add_feature|bug_fix|refactor>
-  affected_controls: [<controls involved>]
+  change_type: add|modify|delete
+  affected_controls: [<controls>]
 ```
 
-## Processing Steps
-
-1. **Analyze Code Structure**
-   - Identify method dependencies
-   - Check event handlers
-   - Review control references
-
-2. **Identify Public Interfaces**
-   - What's exposed?
-   - What's internal?
-   - What's safe to change?
-
-3. **Check Dependencies**
-   - Who calls this?
-   - What depends on this?
-   - Where is data used?
-
-4. **Determine Safe Boundaries**
-   - What can change safely?
-   - What must stay the same?
-   - Where are the risks?
-
-## Output Format
+## Output
 
 ```yaml
-safe_change_boundary:
-  
+safe_boundaries:
   file_analyzed: <path>
-  
-  method_analysis:
-    - method: <method name>
-      safe_to_modify: <yes|no>
-      safe_area: <description>
-      unsafe_area: <description>
-      public_interface: <what's exposed>
-      dependencies: [<what depends>]
-  
-  boundary_recommendations:
-    safe_modifications:
-      - <modification>
-      - <modification>
-    
-    unsafe_modifications:
-      - <modification>
-      - <modification>
-  
-  public_api_analysis:
-    public_methods: [<list>]
-    public_properties: [<list>]
-    must_not_change: <what would break callers>
-  
-  internal_usage:
-    - item: <internal usage>
-      safe_to_change: <yes|no>
-      reason: <why>
-  
+
+  public_api:
+    exposed_methods: [<list>]
+    exposed_properties: [<list>]
+    must_not_change: [<what would break callers>]
+
+  safe_modifications:
+    - area: <description>
+      safety: SAFE
+      reason: <why safe>
+
+  unsafe_modifications:
+    - area: <description>
+      safety: UNSAFE
+      reason: <why unsafe>
+      impact: <what breaks>
+
+  recommendations:
+    - <actionable recommendation>
+
   risk_assessment:
-    modification_risk: <low|medium|high>
-    regression_risk: <low|medium|high>
-    safety_recommendations: [<list>]
+    change_risk: LOW|MEDIUM|HIGH
+    regression_risk: LOW|MEDIUM|HIGH
+
+  confidence: HIGH|MEDIUM|LOW
 ```
 
-## Related Skills
-- `webforms-lifecycle-analyzer` - Checks lifecycle compliance
-- `minimal-diff-planner` - Plans minimal changes
+## Safe Change Categories
+
+### ALWAYS SAFE
+- Add new private methods
+- Add new private fields
+- Modify method internals (if behavior unchanged)
+- Add new event handlers
+- Add new controls to page
+
+### USUALLY SAFE
+- Add optional parameters (with defaults)
+- Add new public methods (not breaking existing)
+- Modify internal logic (preserving behavior)
+- Add ViewState items
+
+### RISKY (Needs Validation)
+- Change method signatures
+- Modify return types
+- Change property types
+- Alter event handler signatures
+- Remove ViewState items
+
+### NEVER SAFE (Requires Justification)
+- Change public API contracts
+- Break WebForms lifecycle
+- Violate Telerik contracts
+- Remove public methods
+- Change data model contracts
+
+## DO:
+✅ Check for public API exposure
+✅ Validate WebForms lifecycle compliance
+✅ Verify Telerik control contracts
+✅ Identify all callers/dependents
+✅ Assess regression risk
+✅ Document safe boundaries clearly
+
+## DON'T:
+❌ Assume internal methods are safe to change
+❌ Skip checking for event handler usage
+❌ Ignore ViewState dependencies
+❌ Miss control tree dependencies
+❌ Overlook data binding impacts
+
+## Error Conditions
+
+**IF public API change detected:**
+```
+1. Flag as UNSAFE
+2. List impacted callers
+3. Require explicit justification
+4. Document breaking change
+```
+
+**IF lifecycle violation detected:**
+```
+1. Flag as UNSAFE
+2. Explain violation
+3. Suggest safe alternative
+4. Document risk
+```
+
+## Analysis Steps
+
+1. **Identify Public Surface:**
+   - Public methods
+   - Public properties
+   - Event handlers
+   - Exposed controls
+
+2. **Check Dependencies:**
+   - Who calls this method?
+   - What depends on this property?
+   - Where is this data used?
+
+3. **Validate Lifecycle:**
+   - Does change violate WebForms lifecycle?
+   - Are event handlers affected?
+   - Is ViewState handling safe?
+
+4. **Assess Telerik:**
+   - Does change affect Telerik controls?
+   - Are data bindings impacted?
+   - Are control events affected?
+
+## Example 1: Safe Addition
+
+**Input:**
+```yaml
+file_path: CustomerList.aspx.cs
+change_type: add
+description: "Add private ExportToExcel method"
+```
+
+**Output:**
+```yaml
+public_api:
+  must_not_change: [GetCustomers, OnPageLoad]
+
+safe_modifications:
+  - area: "Add private ExportToExcel() method"
+    safety: SAFE
+    reason: "New private method, no public exposure"
+
+recommendations:
+  - "Follow existing export pattern from OrderList"
+  - "Keep method private"
+  - "Test with existing page lifecycle"
+
+change_risk: LOW
+confidence: HIGH
+```
+
+## Example 2: Unsafe Modification
+
+**Input:**
+```yaml
+file_path: CustomerRepository.cs
+change_type: modify
+description: "Change GetCustomers() return type from List to IEnumerable"
+```
+
+**Output:**
+```yaml
+public_api:
+  exposed_methods: [GetCustomers, SaveCustomer]
+  must_not_change: [GetCustomers signature]
+
+unsafe_modifications:
+  - area: "Change GetCustomers() return type"
+    safety: UNSAFE
+    reason: "Public API change - breaks 15 callers"
+    impact: "All pages using GetCustomers will break"
+
+recommendations:
+  - "Add new GetCustomersEnumerable() method instead"
+  - "Deprecate old method gradually"
+  - "Or keep List<T> return type"
+
+change_risk: HIGH
+regression_risk: HIGH
+confidence: HIGH
+```
+
+---
+
+**Related Skills:**
+- `webforms-lifecycle-analyzer` - Validates lifecycle compliance
+- `telerik-impact-checker` - Checks Telerik contracts
+- `minimal-diff-planner` - Plans minimal safe changes

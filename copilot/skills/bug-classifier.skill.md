@@ -1,333 +1,178 @@
-# Bug Classifier Skill
+---
+skill: bug-classifier
+version: 2.0.0
+category: analysis
+complexity: low
+estimated_time: 30-60 seconds
+priority: high
+last_updated: 2026-01-18
+---
+
+# Bug Classifier
+
+## Quick Example
+
+**Input:** "Customer search returns wrong results"
+**Output:** Severity: HIGH, Type: FUNCTIONAL, Reproducible: YES → BUG workflow
+**Time:** 45 seconds
+
+---
 
 ## Purpose
-Categorizes bugs by severity, type, reproducibility, and impact to determine appropriate handling approach.
+Classifies bug reports by severity, type, and reproducibility to determine appropriate response workflow (HOTFIX, BUG, or SPIKE).
 
-## Input Requirements
+## Input
+
 ```yaml
-bug:
-  title: <bug title>
-  description: <what went wrong>
-  error_message: <if applicable>
+bug_report:
+  description: <what's broken>
+  environment: <production|staging|dev>
+  affected_users: <all|many|few|one>
+  error_message: <if any>
   reproduction_steps: <if known>
-  affected_users: <count or estimate>
-  affected_feature: <component/page>
-  environment: <prod|staging|dev>
 ```
 
-## Processing Steps
-
-1. **Severity Classification**
-   - User impact level
-   - Data impact
-   - Production impact
-   - Workaround availability
-
-2. **Type Classification**
-   - Functional (feature broken)
-   - Performance (slow)
-   - Data (incorrect results)
-   - UI (display/UX issue)
-   - Security (vulnerability)
-
-3. **Reproducibility Assessment**
-   - Always reproducible
-   - Intermittent
-   - Rare/difficult to reproduce
-   - Cannot reproduce
-
-4. **Component Identification**
-   - Affected pages
-   - Affected modules
-   - Affected systems
-
-5. **Priority Determination**
-   - Urgency (based on severity + environment)
-   - Impact × Probability
-
-## Output Format
+## Output
 
 ```yaml
-bug_classification:
-  
-  severity:
-    level: <critical|high|medium|low>
-    reasoning: <why this severity>
-  
-  type:
-    primary: <functional|performance|data|ui|security>
-    secondary: [<other types if applicable>]
-  
-  reproducibility:
-    frequency: <always|intermittent|rare|cannot_reproduce>
-    reproduction_difficulty: <easy|moderate|difficult>
-    steps_verified: <yes|no|unknown>
-  
-  impact:
-    affected_users: <count or percentage>
-    affected_feature: <name>
-    data_impacted: <yes|no>
-    business_impact: <none|low|medium|high|critical>
-    workaround_exists: <yes|no>
-  
-  environment:
-    first_reported: <prod|staging|dev>
-    reproducible_in: [<environments>]
-  
-  priority:
-    level: <critical|high|medium|low>
-    rationale: <urgency and impact>
-  
-  escalation:
-    should_escalate: <yes|no>
-    escalate_to: <hotfix|spike|feature_refinement>
-    reason: <if escalating>
-  
-  related_bugs: [<ticket IDs if similar bugs exist>]
-  
-  recommendation:
-    action: <proceed_to_reproduction|hotfix|spike|defer>
-    reason: <brief summary>
+classification:
+  severity: CRITICAL|HIGH|MEDIUM|LOW
+  type: FUNCTIONAL|PERFORMANCE|DATA|UI|SECURITY
+  reproducible: YES|NO|INTERMITTENT
+  affected_users: ALL|MANY|FEW|ONE
+
+  decision:
+    workflow: HOTFIX|BUG|SPIKE
+    urgency: IMMEDIATE|HOURS|DAYS|NORMAL
+    reason: <explanation>
+
+  confidence: HIGH|MEDIUM|LOW
 ```
 
 ## Severity Levels
 
-### Critical
-**Characteristics:**
-- Production system down or severely degraded
+### CRITICAL → HOTFIX (if production)
+- System down or severely degraded
 - Complete feature failure
-- Data corruption or loss
-- Security breach
+- Data corruption
 - All users affected
 - No workaround
 
-**Examples:**
-- Login page returns 500 error
-- Orders failing to save
-- Database connection failure
-- Data being deleted accidentally
-
-**Action:** Immediate investigation and hotfix consideration
-
-### High
-**Characteristics:**
+### HIGH → Expedited BUG
 - Major functionality broken
-- Partial feature failure
-- Multiple users significantly impacted
+- Multiple users affected
 - No workaround
-- Customer-facing
+- Customer-facing issue
 
-**Examples:**
-- Search results incorrect for complex queries
-- Export button throws exception
-- Reports show wrong data
-- Payment processing fails
-
-**Action:** Expedited bug fix workflow
-
-### Medium
-**Characteristics:**
+### MEDIUM → Standard BUG
 - Functionality degraded
 - Workaround exists
-- Specific users or scenarios affected
+- Specific scenarios
 - Intermittent issues
-- Customer inconvenience
 
-**Examples:**
-- Page slow for large datasets
-- Specific filter combination doesn't work
-- Occasional timeout
-- UI element misaligned
-
-**Action:** Standard bug fix workflow
-
-### Low
-**Characteristics:**
+### LOW → Can defer
 - Cosmetic issues
 - Minor inconveniences
 - Rarely encountered
-- No business impact
-- Workaround available
 
-**Examples:**
-- Typo in label
-- Button slightly misaligned
-- Tooltip text unclear
-- Help text incomplete
+## DO:
+✅ Classify based on actual impact
+✅ Escalate CRITICAL + Production to HOTFIX immediately
+✅ Route non-reproducible bugs to SPIKE
+✅ Consider environment (production critical)
+✅ Ask clarifying questions if unclear
+✅ Document classification reasoning
 
-**Action:** Can be batched or deferred
+## DON'T:
+❌ Downgrade severity based on fix difficulty
+❌ Skip impact assessment
+❌ Assume frequency without evidence
+❌ Ignore production environment context
+❌ Proceed with insufficient information
 
-## Bug Type Definitions
+## Error Conditions
 
-### Functional Bug
-- Feature doesn't work as intended
-- Logic error
-- Unexpected behavior
+**IF insufficient information:**
+```
+1. Stop classification
+2. Return: NEEDS_CLARIFICATION
+3. Request:
+   - Specific affected functionality
+   - Steps to reproduce
+   - Expected vs actual behavior
+   - Environment where bug occurs
+```
 
-### Performance Bug
-- System slow
-- Memory leak
-- Resource exhaustion
-- Query inefficient
+**IF cannot reproduce:**
+```
+1. Classify as reproducible: NO
+2. Recommend: SPIKE workflow
+3. Reason: Investigation needed before fix
+```
 
-### Data Bug
-- Wrong data returned
-- Data corruption
-- Calculation error
-- Data loss
+## Decision Matrix
 
-### UI Bug
-- Display issue
-- Layout problem
-- Responsiveness issue
-- Accessibility issue
+```
+Severity  | Environment | Reproducible | → Workflow
+----------|-------------|--------------|------------
+CRITICAL  | Production  | YES/NO       | → HOTFIX
+HIGH      | Production  | YES          | → BUG (expedited)
+HIGH      | Production  | NO           | → SPIKE
+MEDIUM/LOW| Production  | YES          | → BUG
+MEDIUM/LOW| Production  | NO           | → SPIKE
+ANY       | Dev/Staging | YES          | → BUG
+ANY       | Dev/Staging | NO           | → SPIKE
+```
 
-### Security Bug
-- Vulnerability
-- Unauthorized access
-- Data exposure
-- Injection attack
+## Example 1: Critical Production
 
-## Reproducibility Assessment
-
-### Always Reproducible
-**Characteristics:**
-- Same steps always produce bug
-- Consistent behavior
-- Easy to verify fix
-
-**Example:** "Click Export → Error every time"
-
-### Intermittent
-**Characteristics:**
-- Occurs sometimes, not always
-- Specific conditions trigger it
-- May depend on timing or load
-
-**Example:** "Timeout occurs under heavy load"
-
-### Rare/Difficult
-**Characteristics:**
-- Occurs very infrequently
-- Complex conditions to reproduce
-- Hard to verify
-
-**Example:** "Occurs once per week under unknown conditions"
-
-### Cannot Reproduce
-**Characteristics:**
-- User reported issue
-- Cannot recreate in test environment
-- May be environment-specific
-
-**Example:** "Slow page - fast in test, slow in production"
-
-## Classification Examples
-
-### Example 1: Critical Functional Bug
+**Input:**
 ```yaml
-Input:
-  title: "Login returns 500 error"
-  description: "Users cannot log in - getting server error"
-  error_message: "NullReferenceException in LoginHandler"
-  environment: "prod"
-  affected_users: "All"
-
-Output:
-  severity: critical
-  type: functional
-  reproducibility: always
-  affected_users: "All"
-  priority: critical
-  escalation: "yes"
-  escalate_to: hotfix
-  recommendation: "Immediate hotfix required"
+description: "Orders failing 100%"
+environment: production
+affected_users: all
+error_message: "NullReferenceException in ShippingCalculator"
 ```
 
-### Example 2: High Performance Bug
+**Output:**
 ```yaml
-Input:
-  title: "Customer search slow"
-  description: "Search takes 30+ seconds for complex filters"
-  affected_feature: "Customer search"
-  environment: "prod"
-  affected_users: "50"
-
-Output:
-  severity: high
-  type: performance
-  reproducibility: always
-  affected_users: "50"
-  business_impact: high
-  workaround_exists: yes (use simpler filters)
-  priority: high
-  recommendation: "Expedited bug fix, investigate query performance"
+severity: CRITICAL
+type: FUNCTIONAL
+reproducible: YES
+affected_users: ALL
+decision:
+  workflow: HOTFIX
+  urgency: IMMEDIATE
+  reason: "Complete feature failure affecting all users"
+confidence: HIGH
 ```
 
-### Example 3: Medium Intermittent Bug
+## Example 2: Intermittent Issue
+
+**Input:**
 ```yaml
-Input:
-  title: "Occasional timeout on order export"
-  description: "Export sometimes fails with timeout"
-  environment: "prod"
-  affected_users: "handful, intermittent"
-  reproducibility: "Intermittent, cannot reliably reproduce"
-
-Output:
-  severity: medium
-  type: functional, performance
-  reproducibility: intermittent
-  affected_users: "5-10"
-  business_impact: medium
-  workaround_exists: yes (retry or manual export)
-  priority: medium
-  escalation: yes
-  escalate_to: spike
-  reason: "Cannot reproduce reliably - needs investigation"
+description: "Search sometimes times out"
+environment: production
+affected_users: few
+reproduction_steps: "Unknown - happens randomly"
 ```
 
-### Example 4: Low Cosmetic Bug
+**Output:**
 ```yaml
-Input:
-  title: "Button label cut off on mobile"
-  description: "Export button text doesn't fully display"
-  environment: "prod"
-  affected_users: "Mobile users"
-
-Output:
-  severity: low
-  type: ui
-  reproducibility: always
-  affected_users: "Mobile users"
-  business_impact: low
-  workaround_exists: yes (use desktop)
-  priority: low
-  recommendation: "Fix in next regular release, can defer"
+severity: MEDIUM
+type: PERFORMANCE
+reproducible: INTERMITTENT
+affected_users: FEW
+decision:
+  workflow: SPIKE
+  urgency: DAYS
+  reason: "Cannot reproduce - needs investigation"
+confidence: MEDIUM
 ```
 
-## Decision Tree
+---
 
-```
-┌─ Production?
-│  ├─ No → Continue
-│  └─ Yes → Consider HOTFIX
-│
-├─ Severity = Critical?
-│  ├─ Yes → HOTFIX mode
-│  └─ No → Continue
-│
-├─ Can reproduce?
-│  ├─ No → SPIKE mode
-│  └─ Yes → Continue
-│
-├─ Affects many users?
-│  ├─ Yes + High priority → Expedited
-│  └─ No + Low priority → Can defer
-│
-└─ Assign priority based on impact
-```
-
-## Related Skills
-- `webforms-lifecycle-analyzer` - For WebForms-related bugs
-- `linq-query-tracer` - For data bugs
-- `production-impact-assessor` - For severity validation
+**Related Skills:**
+- `bug-impact-analyzer` - Analyzes bug impact depth
+- `production-impact-assessor` - Assesses production severity
+- `minimal-fix-planner` - Plans minimal bug fix
