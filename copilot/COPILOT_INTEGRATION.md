@@ -1,14 +1,23 @@
 ---
-version: 2.0.0
-last_updated: 2026-01-18
+version: 2.1.0
+last_updated: 2026-03-07
 purpose: Main instructions for GitHub Copilot autonomous workflow system
 compatibility: github-copilot-2026
 priority: critical
+instruction_type: normative
 ---
 
 # GitHub Copilot - Autonomous Workflow Instructions
 
 You are an AI assistant using an autonomous workflow system with execution flags.
+
+---
+
+## Document Role (Normative)
+
+This file is the **single normative runtime specification** for Copilot execution behavior.
+- If another file conflicts with this file, this file wins.
+- Other docs (README, guides, examples) are informative/training aids.
 
 ---
 
@@ -75,6 +84,13 @@ Flags:
 
 ### Step 2: Detect MODE
 
+**Deterministic Detection Precedence (must follow in order):**
+
+1. **HOTFIX override** if production/emergency indicators are present
+2. **Explicit user mode intent** (`feature`, `bug`, `hotfix`, `performance`, `spike`, `refinement`)
+3. **Keyword scoring** from mode table
+4. **Fallback** to REFINEMENT if tie/unclear
+
 **Mode Detection Table:**
 
 | Keywords/Pattern | Mode | Agent File |
@@ -85,6 +101,9 @@ Flags:
 | "slow", "optimize", "performance", "speed up" | PERFORMANCE | performance.agent.md |
 | "investigate", "why", "explore", "understand" | SPIKE | spike.agent.md |
 | Unclear/vague requirements | REFINEMENT | story-refinement.agent.md |
+
+**Required output field:**
+- `mode_selection_rationale: <one-line deterministic reason>`
 
 **Confidence Check:**
 - If confidence < MEDIUM in mode detection → Escalate to REFINEMENT mode
@@ -145,6 +164,10 @@ Planning Batch (Stages 6-9):
 **For completion:** Use Completion Template
 
 **CRITICAL:** Copy templates exactly, replace {placeholders}.
+
+**Structured payload requirement (mandatory):**
+- Include `STRUCTURED_PAYLOAD` block in checkpoint/skill/safety/completion outputs.
+- Keep visual template unchanged; payload adds machine-checkable consistency.
 
 ---
 
@@ -231,6 +254,7 @@ Planning Batch (Stages 6-9):
 - ✅ Copy templates EXACTLY
 - ✅ Replace {placeholders} with actual values
 - ✅ Keep formatting (boxes, lines, spacing)
+- ✅ Include mandatory `STRUCTURED_PAYLOAD`
 - ❌ NEVER modify template structure
 - ❌ NEVER abbreviate or summarize
 
@@ -360,6 +384,8 @@ BUG → FEATURE:
 
 ## Performance Guidelines
 
+**Reference:** `copilot/specs/TOKEN_BUDGET_POLICY.md`
+
 **BATCH these operations:**
 - Executing stages 1-5 (analysis)
 - Executing stages 6-9 (planning)
@@ -376,96 +402,10 @@ BUG → FEATURE:
 
 ---
 
-## Complete Example Workflows
-
-### Example 1: Full Autonomous (No Flags)
-
-```
-User: "Add Excel export to customer list"
-
-Step 1: Parse flags → None → Autonomous mode
-Step 2: Detect mode → "add" → FEATURE
-Step 3: Load → copilot/agents/feature-delivery.agent.md
-Step 4: Execute → Stages 1-9 in two batches
-Step 5: Present → Complete plan using Completion Template
-
-Time: 45 seconds
-Checkpoints: 0 (no stops triggered)
-Output: Ready for implementation
-```
-
-### Example 2: With Checkpoint (approve_before_stage: [6])
-
-```
-User: "Add Excel export"
-Flags:
-  approve_before_stage: [6]
-
-Step 1: Parse flags → Checkpoint before stage 6
-Step 2: Detect mode → FEATURE
-Step 3: Load → feature-delivery.agent.md
-Step 4a: Execute → Stages 1-5
-Step 5a: Present → Using Checkpoint Template → WAIT
-
-User: "Approve"
-
-Step 4b: Execute → Stages 6-9
-Step 5b: Present → Using Completion Template
-
-Time: 50 seconds + user decision time
-Checkpoints: 1
-Output: Ready for implementation
-```
-
-### Example 3: Risk-Based (approve_at_risk: medium)
-
-```
-User: "Optimize customer search query"
-Flags:
-  approve_at_risk: medium
-
-Step 1: Parse flags → Pause if risk >= MEDIUM
-Step 2: Detect mode → PERFORMANCE
-Step 3: Load → performance.agent.md
-Step 4a: Execute → Stages 1-4
-       Stage 4 detects MEDIUM risk → AUTO-STOP
-Step 5a: Present → Using Checkpoint Template → WAIT
-
-User: "Approve"
-
-Step 4b: Execute → Stages 5-9
-Step 5b: Present → Using Completion Template
-
-Time: Variable + user decision
-Checkpoints: 1 (risk-triggered)
-```
-
-### Example 4: Safety Violation
-
-```
-User: "Change CustomerRepository.Search signature"
-
-Step 1: Parse flags → None
-Step 2: Detect mode → FEATURE
-Step 3: Load → feature-delivery.agent.md
-Step 4: Execute → Stages 1-5
-       Stage 6 detects public API change → SAFETY VIOLATION
-Step 5: Present → Using Safety Violation Template → STOP
-
-Cannot continue without:
-  - Fixing violation OR
-  - Providing explicit justification
-
-Time: 30 seconds
-Outcome: STOPPED (safety)
-```
-
----
-
 ## Key Files Reference
 
 **Main Instructions:**
-- `copilot/COPILOT_INTEGRATION.md` (this file)
+- `copilot/COPILOT_INTEGRATION.md` (this file, normative)
 - `copilot/TEMPLATES.md` (exact templates)
 
 **Agents:**
@@ -480,6 +420,8 @@ Outcome: STOPPED (safety)
 **Specifications:**
 - `copilot/specs/EXECUTION_RULES.md` (formal rules)
 - `copilot/specs/requirements.md` (system architecture)
+- `copilot/specs/VERSIONING_POLICY.md` (version & deprecation)
+- `copilot/specs/TOKEN_BUDGET_POLICY.md` (output budgets)
 
 **Skills:**
 - `copilot/skills/` (30+ reusable capabilities)
@@ -499,15 +441,17 @@ Outcome: STOPPED (safety)
 ### Key Principles:
 - **Autonomous by default** - Fast execution
 - **Flags for control** - User decides checkpoints
-- **Templates for consistency** - Exact formats
+- **Templates for consistency** - Exact formats + structured payload
 - **Safety first** - Non-negotiable stops
 - **Batch for performance** - Minimize interruptions
 
 ### Success Criteria:
 ✅ Correct mode detected
+✅ `mode_selection_rationale` included
 ✅ Flags respected
 ✅ Safety rules enforced
 ✅ Templates used exactly
+✅ Structured payload included
 ✅ Results clearly presented
 ✅ User knows next steps
 
@@ -515,4 +459,4 @@ Outcome: STOPPED (safety)
 
 ---
 
-Version: 2.0.0 | Last Updated: 2026-01-18 | Production Ready
+Version: 2.1.0 | Last Updated: 2026-03-07 | Production Ready

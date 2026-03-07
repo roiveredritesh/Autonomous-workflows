@@ -1,6 +1,6 @@
 ---
-version: 1.0.0
-last_updated: 2026-01-18
+version: 1.1.0
+last_updated: 2026-03-07
 purpose: Exact copy-paste templates for consistent outputs
 usage: Reference this file when presenting checkpoints, skills, or errors
 ---
@@ -572,6 +572,60 @@ ARTIFACTS CREATED:
 ═══════════════════════════════════════════════════════════════
 ```
 
+
+---
+
+## Mandatory Structured Payload (Machine-Checkable)
+
+For **Checkpoint**, **Skill Invocation**, **Safety Violation**, and **Completion** outputs,
+append this `STRUCTURED_PAYLOAD` block after the visual template.
+
+### Checkpoint Payload
+```yaml
+STRUCTURED_PAYLOAD:
+  type: checkpoint
+  checkpoint_name: "{checkpoint_name}"
+  stages_completed: [{stage_numbers}]
+  risk_level: "{LOW|MEDIUM|HIGH}"
+  confidence: "{HIGH|MEDIUM|LOW}"
+  decision_required: "{specific_question_for_user}"
+  options: ["approve", "adjust", "spike", "reject"]
+```
+
+### Skill Invocation Payload
+```yaml
+STRUCTURED_PAYLOAD:
+  type: skill_invocation
+  skill_name: "{skill-name}"
+  input_context: "{why_invoking_this_skill}"
+  parameters: {parameter_map}
+  risks_identified: [{risk_items}]
+  confidence: "{HIGH|MEDIUM|LOW}"
+```
+
+### Safety Violation Payload
+```yaml
+STRUCTURED_PAYLOAD:
+  type: safety_violation
+  violation_type: "{violation_type}"
+  detected_at: "{stage_or_location}"
+  severity: "NON-NEGOTIABLE STOP"
+  required_action: "{what_must_be_done_to_proceed}"
+```
+
+### Completion Payload
+```yaml
+STRUCTURED_PAYLOAD:
+  type: completion
+  mode: "{workflow_mode}"
+  execution_time: "{duration}"
+  execution_mode: "{autonomous|hybrid|manual}"
+  checkpoints: {number_of_checkpoints}
+  final_status: "READY FOR IMPLEMENTATION"
+  risk_level: "{FINAL_RISK_LEVEL}"
+  confidence: "{FINAL_CONFIDENCE}"
+```
+
 ---
 
 ## Usage Guidelines
@@ -629,6 +683,7 @@ ARTIFACTS CREATED:
 
 ## Version History
 
+- v1.1.0 (2026-03-07): Added mandatory structured payload blocks for machine-checkable outputs
 - v1.0.0 (2026-01-18): Initial templates created
   - Checkpoint template
   - Skill invocation template

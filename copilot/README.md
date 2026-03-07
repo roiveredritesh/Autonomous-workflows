@@ -6,6 +6,16 @@ This folder contains a complete autonomous workflow system for GitHub Copilot th
 
 ---
 
+## Document Type
+
+**Type:** Informative guide (non-normative)
+
+For runtime behavior and conflict resolution, use:
+- `copilot/COPILOT_INTEGRATION.md` (single normative execution spec)
+- `copilot/specs/NORMATIVE_SOURCES.md` (authority and precedence)
+
+---
+
 ## Quick Start
 
 **Integrating with your project? Start here:**

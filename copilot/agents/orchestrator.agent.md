@@ -1,10 +1,10 @@
 ---
 agent: orchestrator
-version: 2.0.0
+version: 2.1.0
 type: entry-point
 mode: meta
 priority: critical
-last_updated: 2026-01-18
+last_updated: 2026-03-07
 ---
 
 # Orchestrator Agent
@@ -55,6 +55,12 @@ Formats accepted:
 
 ### 2. Detect MODE
 
+**Deterministic precedence (strict order):**
+1. HOTFIX override (prod/emergency indicators)
+2. Explicit user mode intent (feature|bug|hotfix|performance|spike|refinement)
+3. Keyword scoring table
+4. Fallback to REFINEMENT on tie/unclear
+
 **Detection Table:**
 
 | Keywords | Mode | Agent | Confidence |
@@ -68,8 +74,11 @@ Formats accepted:
 
 **Rules:**
 - If confidence < MEDIUM → Escalate to REFINEMENT
-- If multiple modes match → Use highest priority (HOTFIX > BUG > FEATURE > PERFORMANCE)
+- If multiple modes match after scoring → use strict precedence HOTFIX > BUG > FEATURE > PERFORMANCE > SPIKE > REFINEMENT
 - If no match → Default to REFINEMENT
+
+**Required output:**
+- `mode_selection_rationale: <one-line reason>`
 
 **Output:** Mode and target agent filename
 
@@ -387,4 +396,4 @@ Step 7: Present final results
 
 ---
 
-Version: 2.0.0 | Lines: ~250 | Production Ready
+Version: 2.1.0 | Lines: ~260 | Production Ready
