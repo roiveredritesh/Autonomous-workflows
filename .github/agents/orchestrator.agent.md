@@ -21,44 +21,21 @@ last_updated: 2026-01-18
 ## Quick Example
 
 ```
-User: "Add Excel export [approve_before_stage: 6]"
+User: "Add Excel export to customer list"
 
 YOU DO:
-1. Parse flags: approve_before_stage: [6]
-2. Detect mode: "add" → FEATURE
-3. Load: agents/feature-delivery.agent.md
-4. Configure: Checkpoint before stage 6
-5. Delegate: Execute with checkpoint at stage 6
+1. Detect mode: "add" → FEATURE
+2. Load: agents/feature-delivery.agent.md
+3. Delegate: Execute feature delivery workflow
 
-Result: Feature agent pauses after analysis for user approval
+Result: Feature agent delivers complete plan with requirements, analysis, and implementation strategy
 ```
 
 ---
 
 ## Execution Flow
 
-### 1. Parse Flags
-
-Extract from user input:
-
-```yaml
-Formats accepted:
-  - Inline: "Request [approve_before_stage: 6]"
-  - YAML block: "Request\nFlags:\n  approve_at_risk: medium"
-  - Natural language: "Request, but pause before implementation"
-```
-
-**Validation:**
-- Validate flag types and values
-- Apply defaults for missing flags
-- Detect conflicts and resolve per priority order
-- Reference: `specs/README.md (archived)` Rule 1.1-1.3
-
-**Output:** Execution context with validated flags
-
----
-
-### 2. Detect MODE
+### 1. Detect MODE
 
 **Detection Table:**
 
@@ -98,50 +75,25 @@ Formats accepted:
 
 ---
 
-### 4. Monitor Execution
+### 3. Monitor Execution
 
-**During agent execution, check after each stage:**
+**During agent execution, check continuously:**
 
 ```yaml
 1. Check safety rules:
    IF safety_violation → STOP immediately, use Safety Template
 
-2. Check risk level:
-   IF risk >= flag threshold → CHECKPOINT, use Checkpoint Template
-
-3. Check stage flags:
-   IF current_stage in approve_before_stage → CHECKPOINT
-
-4. Check confidence:
+2. Check confidence:
    IF confidence == LOW → ESCALATE to SPIKE
 
-5. Check requirements:
+3. Check requirements:
    IF requirements_unclear → ESCALATE to REFINEMENT
+
+4. Check risk level:
+   IF risk >= HIGH → Present risk assessment
 ```
 
 **Templates:** Use exact templates from `instructions/output-templates.md`
-
----
-
-### 5. Handle Checkpoints
-
-**Present using Checkpoint Template:**
-- Stages completed
-- Consolidated results
-- Risk assessment
-- Decision required
-- Options (Approve/Adjust/Spike/Reject)
-
-**Process user response:**
-
-```yaml
-Approve: Continue execution
-Adjust: Modify parameters, re-run affected stages
-Spike: Switch to SPIKE mode, investigate
-Reject: Stop workflow, preserve work
-```
-
-**Reference:** Response handling in `instructions/integration-overview.md`
 
 ---
 
@@ -152,7 +104,7 @@ Reject: Stop workflow, preserve work
 ```yaml
 BUG → HOTFIX:
   IF: severity == CRITICAL && environment == production
-  DO: Load hotfix.agent.md, enforce manual_mode
+  DO: Load hotfix.agent.md
 
 ANY → SPIKE:
   IF: confidence == LOW || approach_unknown
@@ -167,23 +119,11 @@ BUG → FEATURE:
   DO: Load feature-delivery.agent.md
 ```
 
-**Use Mode Escalation Template** from TEMPLATES.md
+**Use Mode Escalation Template** from output-templates.md
 
 ---
 
 ## Error Handling
-
-### IF Flag Validation Fails:
-
-```yaml
-1. STOP before execution starts
-2. Present error with clear message:
-   "Invalid flag: {name}
-    Provided: {value}
-    Expected: {type} in {valid_range}"
-3. Request correction
-4. DO NOT proceed with invalid flags
-```
 
 ### IF Mode Detection Fails:
 
@@ -214,46 +154,22 @@ BUG → FEATURE:
 
 ### ✅ DO:
 
-- Parse flags BEFORE mode detection
-- Validate ALL flags before proceeding
+- Detect mode accurately before loading agent
 - Read ENTIRE target agent file
-- Merge flags properly (priority order)
 - Monitor execution continuously
-- Use exact templates from TEMPLATES.md
+- Use exact templates from output-templates.md
 - Stop immediately on safety violations
 - Escalate when confidence low
 - Preserve work when escalating
 
 ### ❌ DON'T:
 
-- Skip flag validation
-- Proceed with invalid flags
 - Ignore mode detection confidence
 - Load agent without reading fully
-- Modify flags after parsing
 - Bypass safety checks
 - Continue after critical errors
 - Ignore escalation conditions
 - Lose work when switching modes
-
----
-
-## Flag Priority Order
-
-When multiple flags/conditions trigger:
-
-```
-1. manual_mode (highest - overrides all)
-2. Safety violations (cannot disable)
-3. HIGH risk auto-stop (cannot disable)
-4. approve_at_risk
-5. approve_before_stage
-6. approve_before_skills
-7. checkpoint_strategy
-8. Agent defaults (lowest)
-```
-
-**Deduplication:** If multiple triggers at same stage, merge into single checkpoint.
 
 ---
 
@@ -262,38 +178,34 @@ When multiple flags/conditions trigger:
 ```yaml
 orchestrator.agent.md (YOU):
   ↓
-  1. Parse flags
-  2. Detect mode
-  3. Load target agent
+  1. Detect mode
+  2. Load target agent
   ↓
 target-agent.agent.md:
   ↓
-  Execute stages per configuration
+  Execute workflow phases
   Invoke skills as needed
   ↓
 orchestrator.agent.md (YOU):
   ↓
-  4. Monitor execution
-  5. Handle checkpoints
-  6. Process responses
+  3. Monitor execution
+  4. Handle escalations
 ```
 
-**You remain active** during target agent execution to enforce rules and handle checkpoints.
+**You remain active** during target agent execution to enforce rules and handle escalations.
 
 ---
 
 ## Key Responsibilities
 
 **Before Execution:**
-- ✅ Parse and validate flags
 - ✅ Detect mode with confidence check
-- ✅ Load and configure target agent
+- ✅ Load target agent
 
 **During Execution:**
 - ✅ Monitor for safety violations
 - ✅ Check risk levels
-- ✅ Enforce checkpoint flags
-- ✅ Handle user responses
+- ✅ Check confidence levels
 
 **Escalation:**
 - ✅ Detect escalation conditions
@@ -307,10 +219,9 @@ orchestrator.agent.md (YOU):
 
 **Use these exact templates from** `instructions/output-templates.md`:
 
-- Checkpoint Template → At all flagged checkpoints
 - Safety Violation Template → On safety rule violations
 - Mode Escalation Template → When switching modes
-- Error Handling Template → On validation/load failures
+- Error Handling Template → On load failures
 
 **NEVER** create custom formats. Always use provided templates.
 
@@ -320,48 +231,28 @@ orchestrator.agent.md (YOU):
 
 ```
 User: "Optimize customer search query"
-Flags:
-  approve_at_risk: medium
 
 ORCHESTRATOR (YOU):
 
-Step 1: Parse flags
-  ✓ approve_at_risk: medium (valid)
-  ✓ Execution mode: hybrid
-
-Step 2: Detect mode
+Step 1: Detect mode
   ✓ Keywords: "optimize", "query"
   ✓ Mode: PERFORMANCE
   ✓ Confidence: HIGH
   ✓ Agent: performance.agent.md
 
-Step 3: Load agent
+Step 2: Load agent
   ✓ Read performance.agent.md
-  ✓ Merge flags: approve_at_risk: medium
-  ✓ Configure: Pause if risk >= MEDIUM
+  ✓ Parse workflow phases
 
-Step 4: Delegate to performance agent
-  → Performance agent executes stages 1-4
-  → Stage 4 detects MEDIUM risk
-  → Trigger: risk >= threshold
+Step 3: Delegate to performance agent
+  → Performance agent executes analysis phase
+  → Performance agent executes planning phase
+  → Delivers complete optimization plan
 
-Step 5: Handle checkpoint
-  ✓ Use Checkpoint Template
-  ✓ Present risk analysis
-  ✓ Wait for user response
-
-User: "Approve"
-
-Step 6: Continue delegation
-  → Performance agent continues stages 5-9
-  → Completes successfully
-
-Step 7: Present final results
+Step 4: Present final results
   ✓ Use Completion Template
 ```
 
-**Total time:** Variable + user decision
-**Checkpoints:** 1 (risk-triggered)
 **Outcome:** Complete performance optimization plan
 
 ---
@@ -370,15 +261,12 @@ Step 7: Present final results
 
 **Your role:**
 1. Entry point for ALL workflows
-2. Flag parser and validator
-3. Mode detector
-4. Agent loader and configurator
-5. Execution monitor
-6. Checkpoint handler
-7. Escalation manager
+2. Mode detector
+3. Agent loader
+4. Execution monitor
+5. Escalation manager
 
 **Success criteria:**
-✅ Flags validated correctly
 ✅ Mode detected with confidence
 ✅ Appropriate agent loaded
 ✅ Rules enforced consistently
