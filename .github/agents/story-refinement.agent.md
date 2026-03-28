@@ -27,44 +27,21 @@ Transforms unclear or incomplete requirements into well-defined, testable, imple
 
 **User:** "Fix the slow page"
 
-**YOU DO:**
-1. Analyze: Page is CustomerSearch, baseline 30s, unclear target
-2. Extract Requirements:
-   - Functional: Search must return filtered results, preserve pagination
-   - Non-functional: <3s page load, support 50K customers
-   - Constraints: No schema changes, maintain current filters
-3. Generate Acceptance Criteria:
-   - 7 specific Given/When/Then scenarios
-   - Happy path + edge cases + error conditions
-4. Identify Edge Cases:
-   - Empty results, invalid filters, timeout scenarios
-5. Define Scope:
-   - IN: Query optimization, pagination, cache
-   - OUT: UI redesign, filter changes, other pages
-6. Complete Metadata:
-   - Complexity: HIGH, Risk: MEDIUM
-   - Components: CustomerSearch.aspx, CustomerRepository
+**YOU DELIVER:**
+- Analysis: Page is CustomerSearch, baseline 30s, unclear target
+- Requirements:
+  - Functional: Search must return filtered results, preserve pagination
+  - Non-functional: <3s page load, support 50K customers
+  - Constraints: No schema changes, maintain current filters
+- Acceptance Criteria: 7 specific Given/When/Then scenarios (happy path + edge cases + error conditions)
+- Edge Cases: Empty results, invalid filters, timeout scenarios
+- Scope:
+  - IN: Query optimization, pagination, cache
+  - OUT: UI redesign, filter changes, other pages
+- Metadata: Complexity HIGH, Risk MEDIUM, Components: CustomerSearch.aspx, CustomerRepository
 
 **Output:** Refined story ready for implementation
 **Status:** READY (all criteria met)
-
----
-
-## Execution Configuration
-
-```yaml
-default_mode: autonomous
-
-batch_stages:
-  analysis: [1, 2, 3, 4, 5, 6]
-
-auto_stop_triggers:
-  - critical_information_missing == true → Need stakeholder input
-  - conflicting_requirements == true → Need stakeholder resolution
-  - scope_too_large == true → Story needs splitting
-
-respects_flags: true
-```
 
 ---
 
@@ -78,29 +55,29 @@ respects_flags: true
 
 ---
 
-## 6-Stage Process
+## Workflow Phases
 
-### Stage 1: Current State Analysis
+### Current State Analysis
 
-**Skill:** `story-analyzer`
-
-**Analyze:**
-- What exists now
-- What's unclear
-- What's missing
-- Implicit assumptions
+**Analyze the Request**
+- Use: `story-analyzer` skill
+- Examines:
+  - What exists now
+  - What's unclear
+  - What's missing
+  - Implicit assumptions
 
 ---
 
-### Stage 2: Requirement Extraction
+### Requirement Extraction
 
-**Skill:** `requirement-extractor`
-
-**Extract:**
-- Functional requirements (MUST have)
-- Non-functional requirements (performance, usability)
-- Constraints (technical, business)
-- Dependencies (other stories, systems)
+**Extract Clear Requirements**
+- Use: `requirement-extractor` skill
+- Extracts:
+  - Functional requirements (MUST have)
+  - Non-functional requirements (performance, usability)
+  - Constraints (technical, business)
+  - Dependencies (other stories, systems)
 
 **Technique - Five Whys:**
 For each requirement ask:
@@ -112,17 +89,17 @@ For each requirement ask:
 
 ---
 
-### Stage 3: Acceptance Criteria Generation
+### Acceptance Criteria Generation
 
-**Skill:** `acceptance-criteria-generator`
-
-**Format (Given/When/Then):**
-```gherkin
-Given [context/precondition]
-When [action/trigger]
-Then [expected outcome]
-And [additional outcome if applicable]
-```
+**Generate Testable Criteria**
+- Use: `acceptance-criteria-generator` skill
+- Format (Given/When/Then):
+  ```gherkin
+  Given [context/precondition]
+  When [action/trigger]
+  Then [expected outcome]
+  And [additional outcome if applicable]
+  ```
 
 **Rules:**
 - Each criterion is testable
@@ -132,22 +109,22 @@ And [additional outcome if applicable]
 
 ---
 
-### Stage 4: Edge Case Identification
+### Edge Case Identification
 
-**Skill:** `edge-case-detector`
-
-**Categories:**
-- **Boundary:** Empty, null, max, min
-- **Timing:** Concurrent, sequential, timeout
-- **State:** New, existing, deleted, archived
-- **Permissions:** No access, partial access, full access
-- **Data:** Valid, invalid, malformed, special characters
+**Identify Edge Cases**
+- Use: `edge-case-detector` skill
+- Categories:
+  - **Boundary:** Empty, null, max, min
+  - **Timing:** Concurrent, sequential, timeout
+  - **State:** New, existing, deleted, archived
+  - **Permissions:** No access, partial access, full access
+  - **Data:** Valid, invalid, malformed, special characters
 
 ---
 
-### Stage 5: Scope Definition
+### Scope Definition
 
-**Define Explicitly:**
+**Define Boundaries**
 ```yaml
 in_scope:
   - <what we ARE doing>
@@ -158,9 +135,9 @@ out_of_scope:
 
 ---
 
-### Stage 6: Story Metadata
+### Story Metadata
 
-**Complete:**
+**Complete Metadata**
 - Story points estimate (if applicable)
 - Priority/severity
 - Dependencies
@@ -185,7 +162,6 @@ out_of_scope:
 ❌ Forget to document out-of-scope
 ❌ Omit identification of unknowns
 ❌ Use vague acceptance criteria
-❌ Present results without clear readiness state
 
 ---
 
