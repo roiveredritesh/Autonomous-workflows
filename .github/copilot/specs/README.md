@@ -8,17 +8,17 @@ The original specs folder contained detailed specifications for an execution con
 Instead of runtime execution control, this framework provides:
 
 1. **Structured Workflows** - Clear stage-by-stage processes
-   - See: `copilot/agents/` for workflow definitions
+   - See: `agents/` for workflow definitions
 
 2. **Analysis Skills** - Specialized analysis capabilities
-   - See: `copilot/skills/` for 28 categorized skills
+   - See: `skills/` for 28 categorized skills
 
 3. **Coding Standards** - Best practices and patterns
-   - See: `copilot/instructions/` for modular standards
+   - See: `instructions/` for modular standards
    - See: Root `copilot-instructions.md` for quick reference
 
 4. **Output Structure** - Saving stage outputs
-   - See: `copilot/OUTPUT_STRUCTURE.md` for details
+   - See: `OUTPUT_STRUCTURE.md` for details
 
 ## Integration with Copilot
 
@@ -32,10 +32,10 @@ No checkpoint mechanisms, execution flags, or approval gates.
 
 ## Documentation
 
-**Quick Start:** `copilot/SIMPLIFIED_INTEGRATION.md`
-**Skills Catalog:** `copilot/skills/README.md`
-**Coding Standards:** `copilot/instructions/`
-**Agents:** `copilot/agents/`
+**Quick Start:** `SIMPLIFIED_INTEGRATION.md`
+**Skills Catalog:** `skills/README.md`
+**Coding Standards:** `instructions/`
+**Agents:** `agents/`
 
 ---
 

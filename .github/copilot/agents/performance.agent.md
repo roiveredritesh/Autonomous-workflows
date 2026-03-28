@@ -239,7 +239,7 @@ LOW    | *     | *          | Defer indefinitely
 
 ## Checkpoint Presentation
 
-Use template from `copilot/TEMPLATES.md` - "Standard Checkpoint"
+Use template from `instructions/output-templates.md` - "Standard Checkpoint"
 
 **Present after stages 1-3 (if flagged):**
 - Stages completed: 1 (Baseline), 2 (Bottleneck), 3 (Root Cause)
@@ -374,6 +374,6 @@ STATUS: READY FOR IMPLEMENTATION
 ---
 
 **See also:**
-- Templates: `copilot/TEMPLATES.md`
-- Execution rules: `copilot/specs/EXECUTION_RULES.md`
-- Integration: `copilot/COPILOT_INTEGRATION.md`
+- Templates: `instructions/output-templates.md`
+- Execution rules: `specs/README.md (archived)`
+- Integration: `instructions/integration-overview.md`

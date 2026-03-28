@@ -165,7 +165,7 @@ Orchestrates end-to-end delivery of new features in legacy ASP.NET WebForms appl
 
 ## Skill Invocation
 
-Use template from `copilot/TEMPLATES.md` - "Skill Invocation Template"
+Use template from `instructions/output-templates.md` - "Skill Invocation Template"
 
 **For every skill:**
 ```
@@ -187,7 +187,7 @@ OUTPUT:
 
 ## Completion Output
 
-Use template from `copilot/TEMPLATES.md` - "Completion Template"
+Use template from `instructions/output-templates.md` - "Completion Template"
 
 **Include:**
 - Mode: FEATURE DELIVERY
@@ -290,6 +290,6 @@ STATUS: READY FOR IMPLEMENTATION
 ---
 
 **See also:**
-- Templates: `copilot/TEMPLATES.md`
-- Execution rules: `copilot/specs/EXECUTION_RULES.md`
-- Integration: `copilot/COPILOT_INTEGRATION.md`
+- Templates: `instructions/output-templates.md`
+- Execution rules: `specs/README.md (archived)`
+- Integration: `instructions/integration-overview.md`

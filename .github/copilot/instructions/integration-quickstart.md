@@ -15,14 +15,14 @@ Add this section to your existing `.github/copilot-instructions.md`:
 
 When the user requests workflow automation (features, bugs, performance, etc.), use the autonomous workflow system:
 
-**Entry Point:** Load `copilot/agents/orchestrator.agent.md`
+**Entry Point:** Load `agents/orchestrator.agent.md`
 
 **Quick Reference:**
 - Parse execution flags (if provided)
 - Detect MODE: FEATURE, BUG, HOTFIX, PERFORMANCE, SPIKE, or REFINEMENT
-- Load appropriate agent from `copilot/agents/`
+- Load appropriate agent from `agents/`
 - Execute per agent configuration
-- Respect safety rules in `copilot/specs/EXECUTION_RULES.md`
+- Respect safety rules in `specs/README.md (archived)`
 
 **Modes:**
 - `FEATURE` → `feature-delivery.agent.md`
@@ -44,14 +44,14 @@ manual_mode: true              # Approve every stage
 - HIGH risk → AUTOMATIC CHECKPOINT
 - LOW confidence → ESCALATE to SPIKE/REFINEMENT
 
-For full details, see: `copilot/COPILOT_INTEGRATION.md`
+For full details, see: `instructions/integration-overview.md`
 ```
 
 ---
 
 ## Option 2: Inline Instructions
 
-If you want full instructions in your main file, copy the entire content from `copilot/COPILOT_INTEGRATION.md` and paste it as a section in your `.github/copilot-instructions.md`.
+If you want full instructions in your main file, copy the entire content from `instructions/integration-overview.md` and paste it as a section in your `.github/copilot-instructions.md`.
 
 **Pros:** Everything in one file
 **Cons:** Makes your instructions file longer
@@ -76,12 +76,12 @@ If the user's request matches these patterns, activate the autonomous workflow s
 - Unclear requirements → REFINEMENT mode
 
 **When triggered:**
-1. Load `copilot/agents/orchestrator.agent.md`
+1. Load `agents/orchestrator.agent.md`
 2. Follow orchestrator instructions
 3. Load appropriate specialized agent
 4. Execute workflow per agent configuration
 
-For detailed workflow execution, refer to: `copilot/COPILOT_INTEGRATION.md`
+For detailed workflow execution, refer to: `instructions/integration-overview.md`
 ```
 
 ---
@@ -111,7 +111,7 @@ your-project/
 Add a concise section to your existing `.github/copilot-instructions.md` that:
 - Explains when to use the workflow system
 - Shows how to detect mode
-- References the full instructions in `copilot/COPILOT_INTEGRATION.md`
+- References the full instructions in `instructions/integration-overview.md`
 
 This keeps your main instructions clean while making the workflow system available when needed.
 
@@ -147,7 +147,7 @@ For feature development, bug fixes, and workflow automation, use the autonomous 
 
 ### Quick Start
 1. Detect mode from user request (FEATURE, BUG, HOTFIX, etc.)
-2. Load orchestrator: `copilot/agents/orchestrator.agent.md`
+2. Load orchestrator: `agents/orchestrator.agent.md`
 3. Parse execution flags (if provided)
 4. Load appropriate agent
 5. Execute workflow
@@ -163,9 +163,9 @@ For feature development, bug fixes, and workflow automation, use the autonomous 
 - HIGH risk → Checkpoint required
 - LOW confidence → Escalate to investigation
 
-**Full Documentation:** `copilot/COPILOT_INTEGRATION.md`
-**Formal Rules:** `copilot/specs/EXECUTION_RULES.md`
-**User Guides:** `copilot/instructions/`
+**Full Documentation:** `instructions/integration-overview.md`
+**Formal Rules:** `specs/README.md (archived)`
+**User Guides:** `instructions/`
 
 ---
 
@@ -177,7 +177,7 @@ For feature development, bug fixes, and workflow automation, use the autonomous 
 ## Summary
 
 ✅ **Best Practice:** Add a concise reference section to your existing instructions
-✅ **Keep:** Full workflow details in `copilot/COPILOT_INTEGRATION.md`
+✅ **Keep:** Full workflow details in `instructions/integration-overview.md`
 ✅ **Maintain:** Your existing project-specific instructions
 ✅ **Activate:** Workflow system only when needed
 

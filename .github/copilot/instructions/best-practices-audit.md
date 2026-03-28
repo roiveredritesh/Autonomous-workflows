@@ -387,7 +387,7 @@ DO NOT BATCH:
 **Impact:** Minor - but improves clarity
 
 **Current:** Mix of:
-- `copilot/agents/orchestrator.agent.md`
+- `agents/orchestrator.agent.md`
 - `agents/orchestrator.agent.md`
 - `./agents/orchestrator.agent.md`
 

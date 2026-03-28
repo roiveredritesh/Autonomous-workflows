@@ -40,93 +40,70 @@ Orchestrates safe resolution of defects in legacy ASP.NET WebForms application w
 
 **User:** "Customer search returns wrong results when filter applied"
 
-**YOU DO:**
-1. Triage: HIGH severity, FUNCTIONAL type, always reproducible
-2. Root Cause: LINQ .Where() after .ToList() (filtering in memory)
-3. Impact: All filtered searches incorrect, no data corruption
-→ CHECKPOINT (if flagged)
-4. Fix: Move .Where() before .ToList() (2 lines changed)
-5. Safety: No API changes, no lifecycle violations
-6. Regression: 6 test scenarios (filters, edge cases)
-7. Document: Root cause, fix reasoning
-8. Rollback: Git revert procedure
+**YOU DELIVER:**
+- HIGH severity classification, FUNCTIONAL type, always reproducible
+- Root cause: LINQ .Where() after .ToList() (filtering in memory)
+- Impact: All filtered searches incorrect, no data corruption
+- Fix: Move .Where() before .ToList() (2 lines changed)
+- Safety verified: No API changes, no lifecycle violations
+- 6 regression test scenarios (filters, edge cases)
+- Complete documentation and rollback plan
 
 **Output:** Complete bug fix plan (35-45 seconds)
-**Checkpoints:** 0-1 (depends on flags)
 **Risk:** LOW, **Confidence:** HIGH
 
 ---
 
-## Execution Configuration
+## Workflow Phases
 
-```yaml
-default_mode: autonomous
+### Analysis Phase
 
-batch_stages:
-  analysis: [1, 2, 3]
-  planning: [4, 5, 6, 7, 8]
+**Bug Triage**
+- Use: `bug-classifier` skill
+- Delivers: Severity (CRITICAL/HIGH/MEDIUM/LOW), type, affected components, frequency
+- If CRITICAL + Production: Escalate to HOTFIX mode
+- If intermittent/cannot reproduce: Escalate to SPIKE mode
 
-auto_stop_triggers:
-  - severity == CRITICAL && environment == production → HOTFIX mode
-  - reproducible == false → SPIKE mode
-  - safety_violation == true → STOP
-  - root_cause == unknown → SPIKE mode
+**Root Cause Analysis**
+- Use: `webforms-lifecycle-analyzer`, `linq-query-tracer`, `telerik-behavior-analyzer`, `redis-behavior-checker` skills
+- Delivers: Reproduction steps (verified), root cause, why missed initially, related areas
+- If cannot reproduce: Escalate to SPIKE mode
 
-respects_flags: true
-```
-
----
-
-## 8-Stage Process
-
-### Stages 1-3: Analysis (Batch Execution)
-
-**Stage 1: Triage**
-- Skill: `bug-classifier`
-- Output: Severity (CRITICAL/HIGH/MEDIUM/LOW), type, affected components, frequency
-- Decision: CRITICAL + Production → HOTFIX | Intermittent + Cannot reproduce → SPIKE
-
-**Stage 2: Root Cause**
-- Skills: `webforms-lifecycle-analyzer`, `linq-query-tracer`, `telerik-behavior-analyzer`, `redis-behavior-checker`
-- Output: Reproduction steps (verified), root cause, why missed initially, related areas
-- Stop if: Cannot reproduce → SPIKE mode
-
-**Stage 3: Impact & Scope**
-- Skill: `bug-impact-analyzer`
-- Output: User impact, data integrity impact, performance impact, affected functionality
-- Decision: Broader than expected → Re-evaluate as FEATURE
+**Impact & Scope Assessment**
+- Use: `bug-impact-analyzer` skill
+- Delivers: User impact, data integrity impact, performance impact, affected functionality
+- If broader than expected: Re-evaluate as FEATURE request
 
 ---
 
-### Stages 4-8: Planning (Batch Execution)
+### Planning Phase
 
-**Stage 4: Fix Strategy**
-- Skill: `minimal-fix-planner`
-- Output: Minimal change approach, alternatives considered/rejected, code areas to modify
+**Fix Strategy**
+- Use: `minimal-fix-planner` skill
+- Delivers: Minimal change approach, alternatives considered/rejected, code areas to modify
 - Constraints: Fix ONLY the bug, no "improvements", no refactoring, preserve patterns
 
-**Stage 5: Safety Verification**
-- Skills: `safe-change-boundary-detector`, `webforms-lifecycle-validator`, `telerik-contract-validator`
-- Output: Public API changes (NONE or justified), lifecycle violations (NONE), Telerik breaks (NONE)
-- Stop if: Safety violation without mitigation
+**Safety Verification**
+- Use: `safe-change-boundary-detector`, `webforms-lifecycle-validator`, `telerik-contract-validator` skills
+- Delivers: Public API changes (NONE or justified), lifecycle violations (NONE), Telerik breaks (NONE)
+- If safety violation: Stop without mitigation
 
-**Stage 6: Regression Prevention**
-- Skills: `webforms-regression-analyzer`, `test-scenario-generator`
-- Output: Regression test scenarios, related functionality to verify, edge cases, validation criteria
+**Regression Prevention**
+- Use: `webforms-regression-analyzer`, `test-scenario-generator` skills
+- Delivers: Regression test scenarios, related functionality to verify, edge cases, validation criteria
 
-**Stage 7: Documentation**
-- Skills: `bug-fix-documenter`, `root-cause-recorder`
-- Output: Bug description, root cause explanation, fix approach, prevention measures
+**Documentation**
+- Use: `bug-fix-documenter`, `root-cause-recorder` skills
+- Delivers: Bug description, root cause explanation, fix approach, prevention measures
 
-**Stage 8: Rollback**
-- Skill: `rollback-plan-generator`
-- Output: Rollback procedure, rollback validation, rollback risk assessment
+**Rollback Strategy**
+- Use: `rollback-plan-generator` skill
+- Delivers: Rollback procedure, rollback validation, rollback risk assessment
 
 ---
 
 ## DO:
-✅ Batch stages 1-3 (analysis) together
-✅ Batch stages 4-8 (planning) together
+✅ Complete analysis before planning fix
 ✅ Identify root cause before fixing
 ✅ Make minimal, targeted changes
 ✅ Document root cause for pattern detection
@@ -141,7 +118,6 @@ respects_flags: true
 ❌ Proceed if cannot reproduce (escalate to SPIKE)
 ❌ Continue with safety violations
 ❌ Skip regression test planning
-❌ Present results piecemeal (batch them)
 
 ---
 
@@ -149,7 +125,7 @@ respects_flags: true
 
 **IF cannot reproduce bug:**
 ```
-1. Stop after stage 2
+1. Stop during root cause analysis
 2. Escalate to SPIKE mode:
    📢 MODE ESCALATION
    FROM: BUG FIX → TO: SPIKE
@@ -159,7 +135,7 @@ respects_flags: true
 
 **IF root cause unknown:**
 ```
-1. Stop after stage 2
+1. Stop during root cause analysis
 2. Escalate to SPIKE mode:
    📢 MODE ESCALATION
    FROM: BUG FIX → TO: SPIKE
@@ -169,7 +145,7 @@ respects_flags: true
 
 **IF critical + production:**
 ```
-1. Stop after stage 1
+1. Stop during triage
 2. Escalate to HOTFIX mode:
    📢 MODE ESCALATION
    FROM: BUG FIX → TO: HOTFIX
@@ -230,19 +206,6 @@ Track for pattern detection:
 
 ---
 
-## Checkpoint Presentation
-
-Use template from `copilot/TEMPLATES.md` - "Standard Checkpoint"
-
-**Present after stages 1-3 (if flagged):**
-- Stages completed: 1 (Triage), 2 (Root Cause), 3 (Impact)
-- Consolidated results: Bug classification, root cause, impact assessment
-- Risk assessment
-- Confidence level
-- Options: Approve fix planning | Adjust approach | Spike | Reject
-
----
-
 ## Complete Example
 
 **Input:** "Customer search returns wrong results"
@@ -250,7 +213,9 @@ Use template from `copilot/TEMPLATES.md` - "Standard Checkpoint"
 **Execution:**
 
 ```
-Stage 1: Triage
+ANALYSIS PHASE:
+
+Bug Triage
 → SKILL: bug-classifier
 → OUTPUT:
   severity: HIGH
@@ -258,7 +223,7 @@ Stage 1: Triage
   frequency: ALWAYS
   components: [CustomerSearch.aspx, CustomerRepository]
 
-Stage 2: Root Cause
+Root Cause Analysis
 → SKILL: linq-query-tracer
 → OUTPUT:
   root_cause: "LINQ .Where() applied after .ToList() - filtering in memory"
@@ -266,7 +231,7 @@ Stage 2: Root Cause
   why_missed: "Recent refactor moved filter to wrong position"
   related: ["Similar pattern in OrderRepository"]
 
-Stage 3: Impact
+Impact & Scope Assessment
 → SKILL: bug-impact-analyzer
 → OUTPUT:
   user_impact: "All filtered searches return wrong results"
@@ -274,15 +239,9 @@ Stage 3: Impact
   performance: "Worse than expected (loading all records)"
   scope: "Customer search page only"
 
-═══════════════════════════════════════════════════════════════
-CHECKPOINT: Analysis Complete (if approve_before_stage: [4])
-═══════════════════════════════════════════════════════════════
-```
+PLANNING PHASE:
 
-**User approves → Continue:**
-
-```
-Stage 4: Fix Strategy
+Fix Strategy
 → SKILL: minimal-fix-planner
 → OUTPUT:
   approach: "Move .Where() before .ToList()"
@@ -292,7 +251,7 @@ Stage 4: Fix Strategy
     - "Rewrite query (too risky)"
     - "Post-filter (inefficient)"
 
-Stage 5: Safety
+Safety Verification
 → SKILL: safe-change-boundary-detector
 → OUTPUT:
   public_api: NO CHANGES
@@ -300,7 +259,7 @@ Stage 5: Safety
   telerik: NO IMPACT
   safe: CONFIRMED
 
-Stage 6: Regression
+Regression Prevention
 → SKILL: test-scenario-generator
 → OUTPUT: 6 scenarios
   - Active filter applied correctly
@@ -310,14 +269,14 @@ Stage 6: Regression
   - Performance with large dataset
   - Related pages (OrderSearch) unaffected
 
-Stage 7: Documentation
+Documentation
 → SKILL: bug-fix-documenter
 → OUTPUT:
   root_cause: "Filter applied in memory after data retrieval"
   fix: "Moved LINQ .Where() before .ToList()"
   prevention: "Code review checklist updated"
 
-Stage 8: Rollback
+Rollback Strategy
 → SKILL: rollback-plan-generator
 → OUTPUT: Git revert to previous commit, validate search results
 
@@ -365,6 +324,6 @@ STATUS: READY FOR IMPLEMENTATION
 ---
 
 **See also:**
-- Templates: `copilot/TEMPLATES.md`
-- Execution rules: `copilot/specs/EXECUTION_RULES.md`
-- Integration: `copilot/COPILOT_INTEGRATION.md`
+- Templates: `instructions/output-templates.md`
+- Execution rules: `specs/README.md (archived)`
+- Integration: `instructions/integration-overview.md`

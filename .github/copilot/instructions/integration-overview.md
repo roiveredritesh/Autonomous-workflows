@@ -93,7 +93,7 @@ Flags:
 
 ### Step 3: Load Agent
 
-**Location:** `copilot/agents/{agent-name}.agent.md`
+**Location:** `agents/{agent-name}.agent.md`
 
 **Each agent provides:**
 - Quick example showing expected outcome
@@ -136,7 +136,7 @@ Planning Batch (Stages 6-9):
 
 ### Step 5: Present Results
 
-**Use EXACT templates from:** `copilot/TEMPLATES.md`
+**Use EXACT templates from:** `instructions/output-templates.md`
 
 **For checkpoints:** Use Checkpoint Template
 **For skills:** Use Skill Invocation Template
@@ -201,7 +201,7 @@ Planning Batch (Stages 6-9):
 
 ## Skill Invocation
 
-**Location:** `copilot/skills/{skill-name}.skill.md`
+**Location:** `skills/{skill-name}.skill.md`
 
 **Process:**
 1. Read skill definition file
@@ -217,7 +217,7 @@ Planning Batch (Stages 6-9):
 
 ## Templates (CRITICAL)
 
-**Reference:** `copilot/TEMPLATES.md`
+**Reference:** `instructions/output-templates.md`
 
 **Available Templates:**
 1. **Checkpoint Template** - Use at all checkpoints
@@ -465,24 +465,24 @@ Outcome: STOPPED (safety)
 ## Key Files Reference
 
 **Main Instructions:**
-- `copilot/COPILOT_INTEGRATION.md` (this file)
-- `copilot/TEMPLATES.md` (exact templates)
+- `instructions/integration-overview.md` (this file)
+- `instructions/output-templates.md` (exact templates)
 
 **Agents:**
-- `copilot/agents/orchestrator.agent.md` (entry point)
-- `copilot/agents/feature-delivery.agent.md`
-- `copilot/agents/bug-fix.agent.md`
-- `copilot/agents/hotfix.agent.md`
-- `copilot/agents/performance.agent.md`
-- `copilot/agents/spike.agent.md`
-- `copilot/agents/story-refinement.agent.md`
+- `agents/orchestrator.agent.md` (entry point)
+- `agents/feature-delivery.agent.md`
+- `agents/bug-fix.agent.md`
+- `agents/hotfix.agent.md`
+- `agents/performance.agent.md`
+- `agents/spike.agent.md`
+- `agents/story-refinement.agent.md`
 
 **Specifications:**
-- `copilot/specs/EXECUTION_RULES.md` (formal rules)
-- `copilot/specs/requirements.md` (system architecture)
+- `specs/README.md (archived)` (formal rules)
+- `specs/requirements.md` (system architecture)
 
 **Skills:**
-- `copilot/skills/` (30+ reusable capabilities)
+- `skills/` (30+ reusable capabilities)
 
 ---
 

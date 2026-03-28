@@ -189,4 +189,4 @@ This allows sharing final summaries while keeping detailed execution logs local.
 
 ---
 
-**Related:** See `copilot/agents/` for agent implementation details
+**Related:** See `agents/` for agent implementation details

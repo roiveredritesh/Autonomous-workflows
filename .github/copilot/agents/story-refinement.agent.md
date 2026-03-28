@@ -387,6 +387,6 @@ Story is REFINED when:
 ---
 
 **See also:**
-- Templates: `copilot/TEMPLATES.md`
-- Execution rules: `copilot/specs/EXECUTION_RULES.md`
-- Integration: `copilot/COPILOT_INTEGRATION.md`
+- Templates: `instructions/output-templates.md`
+- Execution rules: `specs/README.md (archived)`
+- Integration: `instructions/integration-overview.md`

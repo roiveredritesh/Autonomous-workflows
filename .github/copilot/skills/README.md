@@ -276,10 +276,10 @@ This skill set enables:
 
 ## Related Documentation
 
-- **Agents:** `copilot/agents/` - Workflow orchestration
-- **Integration:** `copilot/SIMPLIFIED_INTEGRATION.md` - How to use with Copilot
+- **Agents:** `agents/` - Workflow orchestration
+- **Integration:** `SIMPLIFIED_INTEGRATION.md` - How to use with Copilot
 - **Standards:** `copilot-instructions.md` - C# coding standards
-- **Templates:** `copilot/TEMPLATES.md` - Output formatting
+- **Templates:** `instructions/output-templates.md` - Output formatting
 - **Reorganization:** `REORGANIZATION_PLAN.md` - Migration from flat structure
 
 **Last Updated:** 2026-03-28

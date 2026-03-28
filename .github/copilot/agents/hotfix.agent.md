@@ -43,43 +43,19 @@ Orchestrates rapid, safe resolution of critical production issues with maximum o
 
 **User:** "Orders failing 100% - NullReferenceException in ShippingCalculator"
 
-**YOU DO:**
-1. Assess: CRITICAL, all users, no workaround → Immediate hotfix
-2. Stabilize: Feature disable if possible (mitigate first)
-3. Diagnose: Recent deployment 2h ago, missing null check
-→ CHECKPOINT (manual mode requires approval)
-4. Strategy: ROLLBACK (safest - recent deployment)
-5. Implement: Create rollback deployment, test in staging
-6. Deploy: Rollback to production, staged rollout
-7. Verify: Monitor 30min, no errors, users can order
-8. Document: Incident report, postmortem plan, proper fix ticket
+**YOU DELIVER:**
+- CRITICAL severity assessment, all users affected, no workaround
+- Stabilization: Feature disable attempted
+- Diagnosis: Recent deployment 2h ago, missing null check
+- Strategy: ROLLBACK (safest - recent deployment)
+- Implementation: Rollback deployment tested in staging
+- Deployment: Rollback to production with staged rollout
+- Verification: 30min monitoring, no errors, users can order
+- Documentation: Incident report, postmortem plan, proper fix ticket
 
 **Output:** Hotfix complete with full documentation
 **Time:** 22 minutes from decision to resolution
-**Mode:** MANUAL (requires approval at every stage)
 **Risk:** LOW (rollback to known good state)
-
----
-
-## Execution Configuration
-
-```yaml
-default_mode: manual  # Hotfix ALWAYS requires human oversight
-
-batch_stages:
-  assessment: [1, 2]
-  execution: [3, 4, 5, 6]
-  verification: [7, 8]
-
-auto_stop_triggers:
-  - rollback_safer_than_fix == true → Recommend rollback
-  - root_cause_confidence == LOW → Cannot fix with low confidence
-  - fix_risk >= HIGH → Fix too risky, find alternative
-  - requires_extensive_changes == true → Not suitable for hotfix
-
-respects_flags: true
-special: "Manual mode default. Override only with explicit approval_override flag."
-```
 
 ---
 
@@ -334,7 +310,7 @@ incident_report:
 
 ## Communication
 
-Use templates from `copilot/TEMPLATES.md`
+Use templates from `instructions/output-templates.md`
 
 **Initial Alert:**
 ```
@@ -478,6 +454,6 @@ STATUS: RESOLVED, monitoring ongoing
 ---
 
 **See also:**
-- Templates: `copilot/TEMPLATES.md`
-- Execution rules: `copilot/specs/EXECUTION_RULES.md`
-- Integration: `copilot/COPILOT_INTEGRATION.md`
+- Templates: `instructions/output-templates.md`
+- Execution rules: `specs/README.md (archived)`
+- Integration: `instructions/integration-overview.md`

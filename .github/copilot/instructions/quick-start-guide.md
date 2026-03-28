@@ -170,7 +170,7 @@ Review the plan, then:
 
 ## Skills Reference
 
-Skills are organized by category in `copilot/skills/{category}/{skill-name}/Skill.md`
+Skills are organized by category in `skills/{category}/{skill-name}/Skill.md`
 
 ### Analysis Skills
 - `story-analyzer` - Examines story state and gaps
@@ -438,9 +438,9 @@ Then implement following the C# standards in copilot-instructions.md"
 **Spike:** `"Investigate [question/approach]"`
 **Refinement:** `"Clarify requirements for [vague request]"`
 
-**See full skills list:** `copilot/skills/README.md`
+**See full skills list:** `skills/README.md`
 **See coding standards:** `copilot-instructions.md`
-**See templates:** `copilot/TEMPLATES.md`
+**See templates:** `instructions/output-templates.md`
 
 ---
 

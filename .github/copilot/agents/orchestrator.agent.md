@@ -52,7 +52,7 @@ Formats accepted:
 - Validate flag types and values
 - Apply defaults for missing flags
 - Detect conflicts and resolve per priority order
-- Reference: `copilot/specs/EXECUTION_RULES.md` Rule 1.1-1.3
+- Reference: `specs/README.md (archived)` Rule 1.1-1.3
 
 **Output:** Execution context with validated flags
 
@@ -82,7 +82,7 @@ Formats accepted:
 
 ### 3. Load Target Agent
 
-**Location:** `copilot/agents/{agent-name}.agent.md`
+**Location:** `agents/{agent-name}.agent.md`
 
 **Process:**
 1. Read ENTIRE agent file
@@ -119,7 +119,7 @@ Formats accepted:
    IF requirements_unclear → ESCALATE to REFINEMENT
 ```
 
-**Templates:** Use exact templates from `copilot/TEMPLATES.md`
+**Templates:** Use exact templates from `instructions/output-templates.md`
 
 ---
 
@@ -141,7 +141,7 @@ Spike: Switch to SPIKE mode, investigate
 Reject: Stop workflow, preserve work
 ```
 
-**Reference:** Response handling in `copilot/COPILOT_INTEGRATION.md`
+**Reference:** Response handling in `instructions/integration-overview.md`
 
 ---
 
@@ -305,7 +305,7 @@ orchestrator.agent.md (YOU):
 
 ## Templates Reference
 
-**Use these exact templates from** `copilot/TEMPLATES.md`:
+**Use these exact templates from** `instructions/output-templates.md`:
 
 - Checkpoint Template → At all flagged checkpoints
 - Safety Violation Template → On safety rule violations
@@ -386,9 +386,9 @@ Step 7: Present final results
 ✅ User kept informed
 
 **Reference files:**
-- `copilot/TEMPLATES.md` - Exact templates
-- `copilot/specs/EXECUTION_RULES.md` - Formal rules
-- `copilot/COPILOT_INTEGRATION.md` - Main instructions
+- `instructions/output-templates.md` - Exact templates
+- `specs/README.md (archived)` - Formal rules
+- `instructions/integration-overview.md` - Main instructions
 
 ---
 
