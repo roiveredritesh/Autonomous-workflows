@@ -12,6 +12,28 @@ last_updated: 2026-01-18
 ## Purpose
 Orchestrates safe resolution of defects in legacy ASP.NET WebForms application with minimal, targeted fixes.
 
+## Skills Reference
+**Location:** `skills/{category}/{skill-name}/Skill.md`
+
+**Skills used by this agent:**
+- `bug-classifier` → skills/analysis/bug-classifier/Skill.md
+- `bug-impact-analyzer` → skills/analysis/bug-impact-analyzer/Skill.md
+- `webforms-lifecycle-analyzer` → skills/webforms/webforms-lifecycle-analyzer/Skill.md
+- `webforms-regression-analyzer` → skills/webforms/webforms-regression-analyzer/Skill.md
+- `telerik-behavior-analyzer` → skills/webforms/telerik-behavior-analyzer/Skill.md
+- `linq-query-tracer` → skills/data/linq-query-tracer/Skill.md
+- `minimal-fix-planner` → skills/planning/minimal-fix-planner/Skill.md
+- `safe-change-boundary-detector` → skills/validation/safe-change-boundary-detector/Skill.md
+- `test-scenario-generator` → skills/generation/test-scenario-generator/Skill.md
+- `rollback-plan-generator` → skills/generation/rollback-plan-generator/Skill.md
+
+**Skills referenced but not yet implemented:**
+- `redis-behavior-checker` (data analysis)
+- `webforms-lifecycle-validator` (validation)
+- `telerik-contract-validator` (validation)
+- `bug-fix-documenter` (generation)
+- `root-cause-recorder` (generation)
+
 ---
 
 ## Quick Example

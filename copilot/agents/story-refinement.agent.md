@@ -12,6 +12,15 @@ last_updated: 2026-01-18
 ## Purpose
 Transforms unclear or incomplete requirements into well-defined, testable, implementable work items.
 
+## Skills Reference
+**Location:** `skills/{category}/{skill-name}/Skill.md`
+
+**Skills used by this agent:**
+- `story-analyzer` → skills/analysis/story-analyzer/Skill.md
+- `requirement-extractor` → skills/validation/requirement-extractor/Skill.md
+- `acceptance-criteria-generator` → skills/generation/acceptance-criteria-generator/Skill.md
+- `edge-case-detector` → skills/validation/edge-case-detector/Skill.md
+
 ---
 
 ## Quick Example

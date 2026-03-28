@@ -1,209 +1,234 @@
-# Skills Inventory & Reference
+# Skills Directory
 
-## 🎯 Standardization Status - COMPLETE! ✅
+## Overview
+28 specialized skills organized by category for autonomous workflow execution with GitHub Copilot.
 
-All skills upgraded to **v2.0.0 standard** with YAML frontmatter, quick examples, DO/DON'T lists, and error handling.
-
-**Progress:** 28/28 skills standardized (100%) ✅
-
-**Major Improvements:**
-- ✅ `minimal-diff-planner` (446→284 lines, -36%)
-- ✅ `bug-classifier` (334→179 lines, -46%)
-- ✅ `linq-query-tracer` (413→298 lines, -28%)
-- ✅ `redis-cache-strategy-analyzer` (481→315 lines, -35%)
-- ✅ Plus 24 more skills standardized!
-
-**See:** `SKILLS_STANDARDIZATION_COMPLETE.md` for full details and `SKILL_TEMPLATE.md` for standard format.
-
-**Status:** ALL COMPLETE - Production ready!
+All skills follow the **v2.0.0 standard** with YAML frontmatter, quick examples, DO/DON'T lists, and error handling.
 
 ---
 
-## Complete Skills List (28 Skills)
+## Folder Structure
 
-### Story & Requirements Skills (6)
-1. **story-analyzer** - Analyzes current story state, identifies gaps and assumptions
-2. **requirement-extractor** - Extracts functional, non-functional, and constraint requirements
-3. **acceptance-criteria-generator** - Creates testable acceptance criteria in Gherkin format
-4. **acceptance-criteria-expander** - Expands criteria to include edge cases and error handling
-5. **edge-case-detector** - Identifies boundary conditions and error scenarios
-6. **test-scenario-generator** - Creates comprehensive test scenarios and test cases
+```
+skills/
+├── analysis/        # 6 skills - Analyze existing code and situations
+├── planning/        # 5 skills - Create implementation or resolution plans
+├── generation/      # 5 skills - Generate artifacts and documentation
+├── validation/      # 4 skills - Validate and extract requirements
+├── webforms/        # 4 skills - ASP.NET WebForms and Telerik specific
+└── data/            # 4 skills - Data access, caching, and performance
+```
 
-### Feature Delivery Skills (4)
-7. **jira-story-intake** - Validates and extracts information from JIRA tickets
-8. **feature-feasibility-analyzer** - Evaluates technical and business feasibility
-9. **minimal-diff-planner** - Plans minimal, focused changes avoiding unnecessary refactoring
-10. **webforms-lifecycle-analyzer** - Analyzes WebForms lifecycle and ViewState impact
+Each skill: `{category}/{skill-name}/Skill.md`
 
-### Bug Fix Skills (5)
-11. **bug-classifier** - Categorizes bugs by severity, type, and reproducibility
-12. **bug-impact-analyzer** - Assesses scope and user impact of bugs
-13. **minimal-fix-planner** - Plans minimal, targeted bug fixes
-14. **safe-change-boundary-detector** - Identifies safe modification points in code
-15. **webforms-regression-analyzer** - Identifies regression risks from changes
+---
 
-### Spike/Investigation Skills (2)
-16. **spike-charter** - Creates focused, time-boxed research investigations
-17. **spike-findings-recorder** - Documents investigation findings and recommendations
+## Skills by Category
 
-### Production & Hotfix Skills (5)
-18. **production-impact-assessor** - Evaluates business and technical impact of incidents
-19. **emergency-mitigation-planner** - Develops immediate stabilization strategies
-20. **hotfix-strategy-planner** - Determines fastest safe resolution approach
-21. **hotfix-deployment-planner** - Plans hotfix deployment and validation
-22. **rollback-plan-generator** - Creates detailed rollback procedures
+### Analysis (6 skills)
+Skills that analyze existing code, situations, or requirements:
 
-### WebForms & Telerik Skills (3)
-23. **telerik-impact-checker** - Validates compatibility with Telerik controls
-24. **telerik-behavior-analyzer** - Analyzes Telerik control behavior in scenarios
-25. **webforms-regression-analyzer** - Identifies WebForms regression risks
+| Skill | Purpose | Time |
+|-------|---------|------|
+| **story-analyzer** | Examines current story state and identifies gaps | 30-60s |
+| **bug-classifier** | Classifies bugs by severity and type | 30-60s |
+| **bug-impact-analyzer** | Assesses bug scope and user impact | 1-2min |
+| **production-impact-assessor** | Evaluates production incidents | 30-60s |
+| **feature-feasibility-analyzer** | Evaluates technical feasibility | 2-3min |
+| **performance-profiler** | Establishes performance baselines | 2-3min |
 
-### Data & Performance Skills (4)
-26. **linq-query-tracer** - Analyzes LINQ query efficiency and optimization
-27. **sql-impact-analyzer** - Evaluates database schema change impacts
-28. **performance-profiler** - Establishes baselines and identifies bottlenecks
-29. **cache-invalidation-mapper** - Maps cache invalidation points
-30. **redis-cache-strategy-analyzer** - (Pre-existing) Analyzes Redis caching strategies
+### Planning (5 skills)
+Skills that create implementation or resolution plans:
 
-## Skill Organization by Agent Usage
+| Skill | Purpose | Time |
+|-------|---------|------|
+| **minimal-diff-planner** | Plans minimal focused changes | 3-5min |
+| **minimal-fix-planner** | Plans minimal bug fixes | 2-3min |
+| **emergency-mitigation-planner** | Develops immediate stabilization | 1-2min |
+| **hotfix-strategy-planner** | Determines fastest safe resolution | 2-4min |
+| **spike-charter** | Creates focused research investigations | 2-3min |
 
-### Orchestrator Agent
-- *(Entry point, uses specialized agents)*
+### Generation (5 skills)
+Skills that generate artifacts, criteria, or documentation:
 
-### Feature Delivery Agent
-Uses: jira-story-intake, acceptance-criteria-expander, feature-feasibility-analyzer, 
-webforms-lifecycle-analyzer, telerik-impact-checker, safe-change-boundary-detector,
-linq-query-tracer, sql-impact-analyzer, redis-cache-strategy-analyzer,
-cache-invalidation-mapper, minimal-diff-planner, webforms-regression-analyzer,
-test-scenario-generator, rollback-plan-generator
+| Skill | Purpose | Time |
+|-------|---------|------|
+| **acceptance-criteria-generator** | Creates testable acceptance criteria | 1-2min |
+| **acceptance-criteria-expander** | Expands criteria with edge cases | 2-3min |
+| **test-scenario-generator** | Creates comprehensive test scenarios | 2-3min |
+| **rollback-plan-generator** | Creates detailed rollback procedures | 1-2min |
+| **spike-findings-recorder** | Documents investigation findings | 1-2min |
 
-### Bug Fix Agent
-Uses: bug-classifier, webforms-lifecycle-analyzer, linq-query-tracer, 
-telerik-behavior-analyzer, redis-behavior-checker, bug-impact-analyzer,
-minimal-fix-planner, safe-change-boundary-detector, webforms-lifecycle-validator,
-telerik-contract-validator, webforms-regression-analyzer, test-scenario-generator,
-rollback-plan-generator
+### Validation (4 skills)
+Skills that validate, check, or extract requirements:
 
-### Hotfix Agent
-Uses: production-impact-assessor, emergency-mitigation-planner, production-log-analyzer,
-error-pattern-detector, change-history-analyzer, hotfix-strategy-planner,
-hotfix-branch-creator, minimal-fix-implementer, hotfix-test-generator, hotfix-validator,
-hotfix-deployment-planner, production-verification-checker, hotfix-incident-documenter,
-postmortem-planner
+| Skill | Purpose | Time |
+|-------|---------|------|
+| **requirement-extractor** | Extracts functional/non-functional requirements | 1-2min |
+| **edge-case-detector** | Identifies boundary conditions | 2-3min |
+| **safe-change-boundary-detector** | Identifies safe modification points | 1-2min |
+| **jira-story-intake** | Validates and extracts JIRA ticket info | 30-60s |
 
-### Spike Agent
-Uses: spike-charter, webforms-lifecycle-analyzer, telerik-behavior-analyzer,
-safe-change-boundary-detector, linq-query-tracer, sql-execution-analyzer,
-cache-performance-checker, data-model-explorer, stored-procedure-analyzer,
-redis-key-inspector, api-contract-analyzer, dependency-mapper, spike-findings-recorder
+### WebForms (4 skills)
+Skills specific to ASP.NET WebForms and Telerik:
 
-### Story Refinement Agent
-Uses: story-analyzer, requirement-extractor, acceptance-criteria-generator,
-edge-case-detector
+| Skill | Purpose | Time |
+|-------|---------|------|
+| **webforms-lifecycle-analyzer** | Analyzes WebForms page lifecycle impact | 1-2min |
+| **webforms-regression-analyzer** | Identifies WebForms regression risks | 2-3min |
+| **telerik-behavior-analyzer** | Analyzes Telerik control behavior | 1-2min |
+| **telerik-impact-checker** | Validates Telerik compatibility | 30-90s |
 
-### Performance Agent
-Uses: performance-profiler, request-profiler, sql-execution-analyzer,
-cache-miss-detector, network-latency-checker, linq-query-tracer,
-sql-execution-plan-analyzer, missing-index-detector, n-plus-one-detector,
-redis-key-strategy-analyzer, cache-stampede-detector, cache-invalidation-analyzer,
-webforms-viewstate-analyzer, serialization-overhead-checker, loop-optimization-scanner,
-optimization-strategy-planner, safe-change-boundary-detector, query-behavior-validator,
-cache-correctness-validator, performance-regression-checker,
-performance-implementation-planner, performance-validation-planner
+### Data (4 skills)
+Skills related to data access, caching, and performance:
 
-## Skills Still Needing Implementation
+| Skill | Purpose | Time |
+|-------|---------|------|
+| **linq-query-tracer** | Analyzes LINQ query efficiency | 2-3min |
+| **sql-impact-analyzer** | Evaluates database change impacts | 2-3min |
+| **redis-cache-strategy-analyzer** | Analyzes Redis caching strategies | 2-3min |
+| **cache-invalidation-mapper** | Maps cache invalidation points | 2-3min |
 
-The following skills are referenced in agents but not yet implemented:
-- production-log-analyzer
-- error-pattern-detector
-- change-history-analyzer
-- hotfix-branch-creator
-- minimal-fix-implementer
-- hotfix-test-generator
-- hotfix-validator
-- hotfix-incident-documenter
-- postmortem-planner
-- data-model-explorer
-- stored-procedure-analyzer
-- redis-key-inspector
-- api-contract-analyzer
-- dependency-mapper
-- request-profiler
-- sql-execution-analyzer
-- cache-miss-detector
-- network-latency-checker
-- sql-execution-plan-analyzer
-- missing-index-detector
-- n-plus-one-detector
-- redis-behavior-checker
-- webforms-lifecycle-validator
-- telerik-contract-validator
-- webforms-viewstate-analyzer
-- serialization-overhead-checker
-- loop-optimization-scanner
-- optimization-strategy-planner
-- query-behavior-validator
-- cache-correctness-validator
-- performance-regression-checker
-- performance-implementation-planner
-- performance-validation-planner
-- hotfix-deployment-planner
-- production-verification-checker
-- change-log-generator
-- decision-record-creator
-- risk-documentation-generator
-- pr-metadata-generator
+---
 
-## Recommended Implementation Order
+## How Skills Are Used
 
-### Phase 1 (Critical for MVP)
-- ✅ All 28 primary skills created
-- These enable basic workflow through all agents
+### By Agents
+Agents invoke skills as part of their workflow execution:
 
-### Phase 2 (High Value)
-Priority skills to implement next:
-1. hotfix-deployment-planner (needed for hotfix execution)
-2. hotfix-branch-creator & hotfix-validator (for code hotfixes)
-3. request-profiler (for performance diagnosis)
-4. sql-execution-analyzer (for query optimization)
-5. optimization-strategy-planner (for performance optimization)
+**Feature Delivery Agent** uses:
+- jira-story-intake, acceptance-criteria-expander, feature-feasibility-analyzer
+- webforms-lifecycle-analyzer, telerik-impact-checker, safe-change-boundary-detector
+- linq-query-tracer, sql-impact-analyzer, redis-cache-strategy-analyzer
+- minimal-diff-planner, test-scenario-generator, rollback-plan-generator
 
-### Phase 3 (Supporting Skills)
-After Phase 2, implement remaining skills based on frequency of use and priority.
+**Bug Fix Agent** uses:
+- bug-classifier, bug-impact-analyzer, minimal-fix-planner
+- webforms-lifecycle-analyzer, webforms-regression-analyzer
+- safe-change-boundary-detector, test-scenario-generator
+
+**Hotfix Agent** uses:
+- production-impact-assessor, emergency-mitigation-planner
+- hotfix-strategy-planner, minimal-fix-planner, rollback-plan-generator
+
+**Performance Agent** uses:
+- performance-profiler, linq-query-tracer, sql-impact-analyzer
+- redis-cache-strategy-analyzer, cache-invalidation-mapper
+
+**Spike Agent** uses:
+- spike-charter, spike-findings-recorder
+- webforms-lifecycle-analyzer, telerik-behavior-analyzer
+- linq-query-tracer, sql-impact-analyzer
+
+**Story Refinement Agent** uses:
+- story-analyzer, requirement-extractor
+- acceptance-criteria-generator, edge-case-detector
+
+### Direct Invocation
+You can request specific skills:
+```
+"Use linq-query-tracer to analyze the customer search query"
+"Use feature-feasibility-analyzer to evaluate adding real-time updates"
+"Use minimal-diff-planner to plan the Excel export implementation"
+```
+
+---
+
+## Skill Standard (v2.0.0)
+
+Every skill includes:
+
+```yaml
+---
+skill: skill-name
+version: 2.0.0
+category: analysis|planning|generation|validation
+complexity: low|medium|high
+estimated_time: 30-90s | 1-4min | 3-10min
+priority: critical|high|medium|low
+last_updated: YYYY-MM-DD
+---
+```
+
+**Quick Example** (first 30 lines)
+- Input example
+- Output example
+- Typical execution time
+
+**Structure:**
+- Purpose (what it does)
+- Input format (YAML)
+- Output format (YAML)
+- DO list (best practices)
+- DON'T list (anti-patterns)
+- Error conditions (IF/THEN handling)
+- Complete examples
+- Related skills
+
+**See:** `SKILL_TEMPLATE.md` for the standard format
+
+---
 
 ## Skill Cross-References
 
-Skills are organized to work together. Key relationships:
-
+### Requirement Extraction Pipeline
 ```
-Requirement Extraction Pipeline:
-  story-analyzer → requirement-extractor → acceptance-criteria-generator 
-  → edge-case-detector → test-scenario-generator
-
-Feasibility Pipeline:
-  jira-story-intake → feature-feasibility-analyzer → spike-charter (if needed)
-
-Bug Fix Pipeline:
-  bug-classifier → bug-impact-analyzer → minimal-fix-planner 
-  → safe-change-boundary-detector → webforms-regression-analyzer
-
-Performance Diagnosis Pipeline:
-  performance-profiler → linq-query-tracer → sql-impact-analyzer 
-  → optimization-strategy-planner
-
-Hotfix Pipeline:
-  production-impact-assessor → emergency-mitigation-planner 
-  → hotfix-strategy-planner → hotfix-deployment-planner → rollback-plan-generator
+story-analyzer
+  → requirement-extractor
+    → acceptance-criteria-generator
+      → edge-case-detector
+        → test-scenario-generator
 ```
+
+### Feature Delivery Pipeline
+```
+jira-story-intake
+  → feature-feasibility-analyzer
+    → webforms-lifecycle-analyzer & telerik-impact-checker
+      → minimal-diff-planner
+        → test-scenario-generator
+          → rollback-plan-generator
+```
+
+### Bug Fix Pipeline
+```
+bug-classifier
+  → bug-impact-analyzer
+    → minimal-fix-planner
+      → safe-change-boundary-detector
+        → webforms-regression-analyzer
+          → test-scenario-generator
+```
+
+### Performance Optimization Pipeline
+```
+performance-profiler
+  → linq-query-tracer & sql-impact-analyzer
+    → redis-cache-strategy-analyzer
+      → cache-invalidation-mapper
+        → minimal-diff-planner
+```
+
+### Hotfix Pipeline
+```
+production-impact-assessor
+  → emergency-mitigation-planner
+    → hotfix-strategy-planner
+      → minimal-fix-planner
+        → rollback-plan-generator
+```
+
+---
 
 ## Usage Guidelines
 
 ### For Feature Delivery
 1. Start with `jira-story-intake` to validate ticket
 2. Use `feature-feasibility-analyzer` to assess approach
-3. Use `webforms-lifecycle-analyzer` to check compatibility
+3. Check with `webforms-lifecycle-analyzer` and `telerik-impact-checker`
 4. Plan changes with `minimal-diff-planner`
 5. Create tests with `test-scenario-generator`
+6. Always generate `rollback-plan-generator`
 
 ### For Bug Fixes
 1. Start with `bug-classifier` to categorize
@@ -217,15 +242,24 @@ Hotfix Pipeline:
 2. Use `emergency-mitigation-planner` for immediate relief
 3. Use `hotfix-strategy-planner` for approach
 4. Always use `rollback-plan-generator` for safety
-5. Document with incident-related skills
+
+### For Performance Issues
+1. Start with `performance-profiler` to baseline
+2. Trace with `linq-query-tracer` and `sql-impact-analyzer`
+3. Design caching with `redis-cache-strategy-analyzer`
+4. Map invalidation with `cache-invalidation-mapper`
+
+---
 
 ## Maintenance Notes
 
-- Skills are self-contained but reference related skills
-- Each skill has specific input/output contracts
-- All skills support Gherkin/YAML formatting for consistency
-- Skills designed to chain together in typical workflows
-- Ready for automation/tool integration
+- **Skills are self-contained** but reference related skills
+- **Each skill has specific input/output contracts**
+- **All skills support YAML formatting** for consistency
+- **Skills designed to chain together** in typical workflows
+- **Ready for automation/tool integration**
+
+---
 
 ## Success Metrics
 
@@ -237,3 +271,15 @@ This skill set enables:
 - ✅ Rapid incident response (hotfixes)
 - ✅ Quality assurance through comprehensive testing
 - ✅ Proper change tracking and rollback capability
+
+---
+
+## Related Documentation
+
+- **Agents:** `copilot/agents/` - Workflow orchestration
+- **Integration:** `copilot/SIMPLIFIED_INTEGRATION.md` - How to use with Copilot
+- **Standards:** `copilot-instructions.md` - C# coding standards
+- **Templates:** `copilot/TEMPLATES.md` - Output formatting
+- **Reorganization:** `REORGANIZATION_PLAN.md` - Migration from flat structure
+
+**Last Updated:** 2026-03-28

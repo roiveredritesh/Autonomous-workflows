@@ -11,6 +11,11 @@ last_updated: 2026-01-18
 
 **Purpose:** Entry point for all workflows. Parses flags, detects mode, loads appropriate agent, monitors execution.
 
+## Skills Reference
+**Location:** `skills/{category}/{skill-name}/Skill.md`
+
+**Note:** The orchestrator agent is a meta-agent that does not directly invoke skills. It delegates execution to specialized agents (feature-delivery, bug-fix, hotfix, performance, spike, story-refinement) which in turn invoke skills as needed. See individual agent files for their skill references.
+
 ---
 
 ## Quick Example

@@ -12,6 +12,25 @@ last_updated: 2026-01-18
 ## Purpose
 Orchestrates end-to-end delivery of new features in legacy ASP.NET WebForms application with safety and minimal changes.
 
+## Skills Reference
+**Location:** `skills/{category}/{skill-name}/Skill.md`
+
+**Skills used by this agent:**
+- `jira-story-intake` → skills/validation/jira-story-intake/Skill.md
+- `acceptance-criteria-expander` → skills/generation/acceptance-criteria-expander/Skill.md
+- `feature-feasibility-analyzer` → skills/analysis/feature-feasibility-analyzer/Skill.md
+- `webforms-lifecycle-analyzer` → skills/webforms/webforms-lifecycle-analyzer/Skill.md
+- `telerik-impact-checker` → skills/webforms/telerik-impact-checker/Skill.md
+- `safe-change-boundary-detector` → skills/validation/safe-change-boundary-detector/Skill.md
+- `linq-query-tracer` → skills/data/linq-query-tracer/Skill.md
+- `sql-impact-analyzer` → skills/data/sql-impact-analyzer/Skill.md
+- `redis-cache-strategy-analyzer` → skills/data/redis-cache-strategy-analyzer/Skill.md
+- `cache-invalidation-mapper` → skills/data/cache-invalidation-mapper/Skill.md
+- `minimal-diff-planner` → skills/planning/minimal-diff-planner/Skill.md
+- `webforms-regression-analyzer` → skills/webforms/webforms-regression-analyzer/Skill.md
+- `test-scenario-generator` → skills/generation/test-scenario-generator/Skill.md
+- `rollback-plan-generator` → skills/generation/rollback-plan-generator/Skill.md
+
 ---
 
 ## Quick Example

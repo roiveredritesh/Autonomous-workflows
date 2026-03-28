@@ -12,6 +12,39 @@ last_updated: 2026-01-18
 ## Purpose
 Orchestrates investigation and optimization of performance issues with measurable improvements and safety verification.
 
+## Skills Reference
+**Location:** `skills/{category}/{skill-name}/Skill.md`
+
+**Skills used by this agent:**
+- `performance-profiler` → skills/analysis/performance-profiler/Skill.md
+- `linq-query-tracer` → skills/data/linq-query-tracer/Skill.md
+- `sql-impact-analyzer` → skills/data/sql-impact-analyzer/Skill.md
+- `redis-cache-strategy-analyzer` → skills/data/redis-cache-strategy-analyzer/Skill.md
+- `cache-invalidation-mapper` → skills/data/cache-invalidation-mapper/Skill.md
+- `safe-change-boundary-detector` → skills/validation/safe-change-boundary-detector/Skill.md
+- `webforms-lifecycle-analyzer` → skills/webforms/webforms-lifecycle-analyzer/Skill.md
+
+**Skills referenced but not yet implemented:**
+- `request-profiler` (analysis)
+- `sql-execution-analyzer` (data)
+- `cache-miss-detector` (data)
+- `network-latency-checker` (analysis)
+- `sql-execution-plan-analyzer` (data)
+- `missing-index-detector` (data)
+- `n-plus-one-detector` (data)
+- `redis-key-strategy-analyzer` (data)
+- `cache-stampede-detector` (data)
+- `cache-invalidation-analyzer` (data)
+- `webforms-viewstate-analyzer` (webforms)
+- `serialization-overhead-checker` (analysis)
+- `loop-optimization-scanner` (analysis)
+- `optimization-strategy-planner` (planning)
+- `query-behavior-validator` (validation)
+- `cache-correctness-validator` (validation)
+- `performance-regression-checker` (validation)
+- `performance-implementation-planner` (planning)
+- `performance-validation-planner` (planning)
+
 ---
 
 ## Quick Example

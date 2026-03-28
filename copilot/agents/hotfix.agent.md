@@ -13,6 +13,30 @@ last_updated: 2026-01-18
 ## Purpose
 Orchestrates rapid, safe resolution of critical production issues with maximum oversight and reversibility.
 
+## Skills Reference
+**Location:** `skills/{category}/{skill-name}/Skill.md`
+
+**Skills used by this agent:**
+- `production-impact-assessor` → skills/analysis/production-impact-assessor/Skill.md
+- `emergency-mitigation-planner` → skills/planning/emergency-mitigation-planner/Skill.md
+- `hotfix-strategy-planner` → skills/planning/hotfix-strategy-planner/Skill.md
+- `minimal-fix-planner` → skills/planning/minimal-fix-planner/Skill.md
+- `rollback-plan-generator` → skills/generation/rollback-plan-generator/Skill.md
+
+**Skills referenced but not yet implemented:**
+- `production-log-analyzer` (analysis)
+- `error-pattern-detector` (analysis)
+- `change-history-analyzer` (analysis)
+- `hotfix-branch-creator` (planning)
+- `minimal-fix-implementer` (generation)
+- `hotfix-test-generator` (generation)
+- `hotfix-validator` (validation)
+- `hotfix-deployment-planner` (planning)
+- `production-verification-checker` (validation)
+- `hotfix-incident-documenter` (generation)
+- `postmortem-planner` (planning)
+- `proper-fix-planner` (planning)
+
 ---
 
 ## Quick Example

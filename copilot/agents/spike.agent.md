@@ -12,6 +12,27 @@ last_updated: 2026-01-18
 ## Purpose
 Orchestrates time-boxed investigation of unknowns with clear research questions and actionable findings.
 
+## Skills Reference
+**Location:** `skills/{category}/{skill-name}/Skill.md`
+
+**Skills used by this agent:**
+- `spike-charter` → skills/planning/spike-charter/Skill.md
+- `spike-findings-recorder` → skills/generation/spike-findings-recorder/Skill.md
+- `webforms-lifecycle-analyzer` → skills/webforms/webforms-lifecycle-analyzer/Skill.md
+- `telerik-behavior-analyzer` → skills/webforms/telerik-behavior-analyzer/Skill.md
+- `safe-change-boundary-detector` → skills/validation/safe-change-boundary-detector/Skill.md
+- `linq-query-tracer` → skills/data/linq-query-tracer/Skill.md
+- `sql-impact-analyzer` → skills/data/sql-impact-analyzer/Skill.md
+
+**Skills referenced but not yet implemented:**
+- `sql-execution-analyzer` (data)
+- `cache-performance-checker` (data)
+- `data-model-explorer` (data)
+- `stored-procedure-analyzer` (data)
+- `redis-key-inspector` (data)
+- `api-contract-analyzer` (validation)
+- `dependency-mapper` (analysis)
+
 ---
 
 ## Quick Example
