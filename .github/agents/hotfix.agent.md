@@ -272,7 +272,7 @@ incident_report:
 
 **IF fix requires extensive changes:**
 ```
-1. Stop at phase 4 (strategy)
+1. Stop during strategy planning
 2. Escalate:
    🛑 NOT SUITABLE FOR HOTFIX
    REASON: Requires extensive changes
@@ -369,7 +369,9 @@ WORKAROUND: <if available>
 **Incident:** "Orders failing 100% - NullReferenceException"
 
 ```
-Phase 1: Assessment
+ASSESSMENT:
+
+Production Impact Assessment
 → SKILL: production-impact-assessor
 → OUTPUT:
   severity: CRITICAL
@@ -378,10 +380,14 @@ Phase 1: Assessment
   workaround: no
   decision: IMMEDIATE_HOTFIX
 
-Phase 2: Stabilize
+STABILIZATION:
+
+Emergency Mitigation
 → Not applicable (no way to disable orders)
 
-Phase 3: Diagnose
+DIAGNOSIS:
+
+Root Cause Investigation
 → SKILLS: production-log-analyzer, change-history-analyzer
 → OUTPUT:
   root_cause: "NullReferenceException in ShippingCalculator"
@@ -389,32 +395,32 @@ Phase 3: Diagnose
   confidence: HIGH
   evidence: "100% of errors same stack trace"
 
-═══════════════════════════════════════════════════════════════
-CHECKPOINT: Diagnosis Complete (manual mode)
-═══════════════════════════════════════════════════════════════
+FIX STRATEGY:
 
-Phase 4: Strategy
+Hotfix Strategy Planning
 → SKILL: hotfix-strategy-planner
 → OUTPUT:
   chosen: ROLLBACK
   reasoning: "Recent deployment, rollback safest"
   alternative: "Could patch code, but rollback faster/safer"
 
-═══════════════════════════════════════════════════════════════
-CHECKPOINT: Strategy Approved (manual mode)
-═══════════════════════════════════════════════════════════════
+IMPLEMENTATION:
 
-Phase 5: Implement
+Code Hotfix Implementation
 → Actions:
   1. Create rollback deployment
   2. Test rollback in staging - PASSED
 
-Phase 6: Deploy
+DEPLOYMENT:
+
+Hotfix Deployment
 → Actions:
   1. Deploy rollback to production
   2. Monitor for errors
 
-Phase 7: Verify
+VERIFICATION:
+
+Production Verification
 → SKILL: production-verification-checker
 → OUTPUT:
   issue_resolved: YES
@@ -422,7 +428,9 @@ Phase 7: Verify
   performance: NORMAL
   monitoring_duration: 30 minutes
 
-Phase 8: Document
+DOCUMENTATION & FOLLOW-UP:
+
+Incident Documentation
 → SKILLS: hotfix-incident-documenter, proper-fix-planner
 → OUTPUT:
   incident_report: Created
@@ -432,9 +440,8 @@ Phase 8: Document
   postmortem: Scheduled
 
 ✅ HOTFIX COMPLETE ✅
-MODE: HOTFIX (Manual)
+MODE: HOTFIX
 TIME: 22 minutes from decision to resolution
-CHECKPOINTS: 6 (every phase requires approval)
 RISK: LOW (rollback to known good state)
 STATUS: RESOLVED, monitoring ongoing
 ```
@@ -449,7 +456,6 @@ STATUS: RESOLVED, monitoring ongoing
 - ALWAYS document incident
 - ALWAYS plan proper fix
 - ALWAYS conduct postmortem for critical incidents
-- ALWAYS use manual mode unless explicitly overridden
 
 ---
 

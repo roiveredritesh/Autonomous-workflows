@@ -18,7 +18,7 @@ Instead of runtime execution control, this framework provides:
    - See: Root `copilot-instructions.md` for quick reference
 
 4. **Output Structure** - Saving stage outputs
-   - See: `OUTPUT_STRUCTURE.md` for details
+   - See: `../OUTPUT_STRUCTURE.md` for details
 
 ## Integration with Copilot
 
@@ -32,7 +32,7 @@ No checkpoint mechanisms, execution flags, or approval gates.
 
 ## Documentation
 
-**Quick Start:** `SIMPLIFIED_INTEGRATION.md`
+**Quick Start:** `instructions/quick-start-guide.md`
 **Skills Catalog:** `skills/README.md`
 **Coding Standards:** `instructions/`
 **Agents:** `agents/`

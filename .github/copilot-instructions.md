@@ -117,7 +117,7 @@ Workflow outputs are saved to `/output/{title}/` with:
 
 ## File Structure
 ```
-.github/copilot/
+.github/
 ├── copilot-instructions.md     ← You are here
 ├── agents/                      ← Workflow orchestrators
 ├── skills/                      ← Analysis capabilities

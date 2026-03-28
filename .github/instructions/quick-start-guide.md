@@ -363,7 +363,7 @@ Implement the changes
 ## Folder Structure
 
 ```
-copilot/
+.github/
 ├── agents/                    # Workflow orchestration
 │   ├── orchestrator.agent.md
 │   ├── feature-delivery.agent.md
@@ -381,11 +381,15 @@ copilot/
 │   ├── webforms/
 │   └── data/
 │
-├── SIMPLIFIED_INTEGRATION.md  # This file
-├── TEMPLATES.md               # Output templates
+├── instructions/
+│   ├── quick-start-guide.md   # This file
+│   ├── output-templates.md    # Output templates
+│   └── integration-overview.md
+│
+├── specs/                     # Archived formal rules
 └── README.md                  # Full documentation
 
-copilot-instructions.md        # C# coding standards
+copilot-instructions.md        # C# coding standards (project root)
 ```
 
 ---
@@ -414,7 +418,7 @@ A: Continue: "Continue with the remaining stages" or "Proceed to implementation 
 The `copilot-instructions.md` file contains C# coding standards. Use it alongside this workflow guide:
 
 **For analysis and planning:**
-→ Use this guide (SIMPLIFIED_INTEGRATION.md)
+→ Use this guide (quick-start-guide.md)
 → Reference appropriate workflow and skills
 
 **For actual coding:**

@@ -149,7 +149,6 @@ respects_flags: true
 ❌ Proceed with unknown impact
 ❌ Skip load testing
 ❌ Make changes without rollback plan
-❌ Present results piecemeal (batch them)
 
 ---
 
@@ -157,7 +156,7 @@ respects_flags: true
 
 **IF baseline not measurable:**
 ```
-1. Stop at stage 1
+1. Stop during baseline measurement
 2. Present error:
    ⚠️ CANNOT OPTIMIZE WITHOUT BASELINE
    REASON: Performance metrics are not measurable
@@ -170,7 +169,7 @@ respects_flags: true
 
 **IF data correctness at risk:**
 ```
-1. Stop at stage 5 (safety)
+1. Stop during safety verification
 2. CRITICAL STOP:
    🛑 DATA CORRECTNESS AT RISK
    OPTIMIZATION: {description}
@@ -184,7 +183,7 @@ respects_flags: true
 
 **IF impact unknown:**
 ```
-1. Stop at stage 4 (strategy)
+1. Stop during strategy planning
 2. Present issue:
    ⚠️ CANNOT QUANTIFY IMPROVEMENT
    REASON: Expected improvement is unknown
@@ -237,19 +236,6 @@ LOW    | *     | *          | Defer indefinitely
 
 ---
 
-## Checkpoint Presentation
-
-Use template from `instructions/output-templates.md` - "Standard Checkpoint"
-
-**Present after stages 1-3 (if flagged):**
-- Stages completed: 1 (Baseline), 2 (Bottleneck), 3 (Root Cause)
-- Consolidated results: Current metrics, bottleneck identified, root cause analysis
-- Expected improvement estimate
-- Risk assessment
-- Options: Approve optimization planning | Adjust approach | Spike | Reject
-
----
-
 ## Complete Example
 
 **Input:** "Customer search is slow"
@@ -257,7 +243,9 @@ Use template from `instructions/output-templates.md` - "Standard Checkpoint"
 **Execution:**
 
 ```
-Stage 1: Baseline
+ANALYSIS PHASE:
+
+Baseline Measurement
 → SKILL: performance-profiler
 → OUTPUT:
   page_load: 8200ms
@@ -266,7 +254,7 @@ Stage 1: Baseline
   result_count: 4500 rows
   p95: 9500ms
 
-Stage 2: Bottleneck
+Bottleneck Identification
 → SKILL: request-profiler
 → OUTPUT:
   component: "CustomerRepository.GetByFilter()"
@@ -274,7 +262,7 @@ Stage 2: Bottleneck
   frequency: Every search
   severity: CRITICAL
 
-Stage 3: Root Cause
+Root Cause Analysis
 → SKILL: linq-query-tracer
 → OUTPUT:
   root_cause: "SELECT * then filter in memory"
@@ -283,15 +271,9 @@ Stage 3: Root Cause
   missing_index: "Status column not indexed"
   impact: "7800ms for query alone"
 
-═══════════════════════════════════════════════════════════════
-CHECKPOINT: Analysis Complete (if approve_before_stage: [4])
-═══════════════════════════════════════════════════════════════
-```
+PLANNING PHASE:
 
-**User approves → Continue:**
-
-```
-Stage 4: Strategy
+Optimization Strategy
 → SKILL: optimization-strategy-planner
 → OUTPUT:
   approach: "Push filter to DB + add index + pagination"
@@ -303,7 +285,7 @@ Stage 4: Strategy
   risk: LOW
   complexity: MEDIUM
 
-Stage 5: Safety
+Safety Verification
 → SKILLS: query-behavior-validator, safe-change-boundary-detector
 → OUTPUT:
   data_correctness: VERIFIED (same results, filtered at DB)
@@ -311,7 +293,7 @@ Stage 5: Safety
   cache_consistency: N/A (no cache currently)
   rollback_safe: YES
 
-Stage 6: Implementation
+Implementation Planning
 → SKILL: performance-implementation-planner
 → OUTPUT:
   Phase 1 (Quick win):
@@ -322,7 +304,7 @@ Stage 6: Implementation
     - Implement pagination
     - Expected: 2000ms → 400ms
 
-Stage 7: Validation
+Validation Planning
 → SKILL: performance-validation-planner
 → OUTPUT:
   metrics:

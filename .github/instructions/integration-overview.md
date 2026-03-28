@@ -20,7 +20,7 @@ User: "Add Excel export to customer list"
 YOU DO:
 1. Parse flags: (none) → autonomous mode
 2. Detect mode: "add" → FEATURE mode
-3. Load: copilot/agents/feature-delivery.agent.md
+3. Load: agents/feature-delivery.agent.md
 4. Execute: Stages 1-5 (analysis) in batch
 5. Execute: Stages 6-9 (planning) in batch
 6. Present: Complete plan (45 seconds total)
@@ -385,7 +385,7 @@ User: "Add Excel export to customer list"
 
 Step 1: Parse flags → None → Autonomous mode
 Step 2: Detect mode → "add" → FEATURE
-Step 3: Load → copilot/agents/feature-delivery.agent.md
+Step 3: Load → agents/feature-delivery.agent.md
 Step 4: Execute → Stages 1-9 in two batches
 Step 5: Present → Complete plan using Completion Template
 

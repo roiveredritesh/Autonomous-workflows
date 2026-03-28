@@ -31,7 +31,7 @@ This framework provides structured workflows, specialized analysis skills, and c
 ## Folder Structure
 
 ```
-.github/copilot/
+.github/
 ├── copilot-instructions.md       ← START HERE
 │
 ├── agents/                        ← Workflow orchestrators

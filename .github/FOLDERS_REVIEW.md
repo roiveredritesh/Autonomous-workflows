@@ -2,8 +2,8 @@
 
 **Review Date:** 2026-03-28
 **Folders Reviewed:**
-- /home/user/Autonomous-workflows/copilot/instructions/
-- /home/user/Autonomous-workflows/copilot/specs/
+- /home/user/Autonomous-workflows/.github/instructions/
+- /home/user/Autonomous-workflows/.github/specs/
 
 ---
 
@@ -19,7 +19,7 @@ Both folders contain well-structured documentation for an autonomous workflow sy
 
 ## Instructions Folder Analysis
 
-### /home/user/Autonomous-workflows/copilot/instructions/
+### /home/user/Autonomous-workflows/.github/instructions/
 
 #### File: README.md
 **Purpose:** Navigation guide for the instructions folder
@@ -117,7 +117,7 @@ Both folders contain well-structured documentation for an autonomous workflow sy
 
 ## Specs Folder Analysis
 
-### /home/user/Autonomous-workflows/copilot/specs/
+### /home/user/Autonomous-workflows/.github/specs/
 
 #### File: README.md
 **Purpose:** Navigation for specs folder

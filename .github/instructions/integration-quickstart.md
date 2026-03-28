@@ -91,14 +91,12 @@ For detailed workflow execution, refer to: `instructions/integration-overview.md
 ```
 your-project/
 ├── .github/
-│   └── copilot-instructions.md (your existing instructions + workflow reference)
-├── copilot/
-│   ├── COPILOT_INTEGRATION.md (full autonomous workflow instructions)
-│   ├── README.md
-│   ├── instructions/ (user guides)
-│   ├── specs/ (formal rules)
-│   ├── agents/ (workflow definitions)
-│   └── skills/ (capabilities)
+│   ├── copilot-instructions.md (your existing instructions + workflow reference)
+│   └── copilot/
+│       ├── instructions/ (including integration-overview.md)
+│       ├── specs/ (formal rules, mostly archived)
+│       ├── agents/ (workflow definitions)
+│       └── skills/ (capabilities)
 └── [your other files]
 ```
 

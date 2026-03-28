@@ -6,13 +6,13 @@ The autonomous workflow framework includes approval flags (`approve_before_stage
 ## Current State
 
 ### Where Approval Mechanisms Are Referenced
-1. **copilot/specs/FLAG_PARSER.md** - Defines approval flags
-2. **copilot/specs/EXECUTION_CONTROL.md** - Describes checkpoint logic
-3. **specs/README.md (archived)** - References approval triggers
-4. **copilot/agents/orchestrator.agent.md** - Shows checkpoint examples
-5. **copilot/agents/*.agent.md** - All agents reference checkpoints
+1. **specs/FLAG_PARSER.md** - Defines approval flags (archived)
+2. **specs/EXECUTION_CONTROL.md** - Describes checkpoint logic (archived)
+3. **specs/README.md** - References approval triggers (archived)
+4. **agents/orchestrator.agent.md** - Shows checkpoint examples
+5. **agents/*.agent.md** - All agents reference checkpoints
 6. **instructions/output-templates.md** - Checkpoint presentation template
-7. **copilot/instructions/*.md** - Usage examples with flags
+7. **instructions/*.md** - Usage examples with flags
 
 ### How They're Described
 - `approve_before_stage: [6]` - Pause before specific stages

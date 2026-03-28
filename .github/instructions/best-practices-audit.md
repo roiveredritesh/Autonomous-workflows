@@ -74,8 +74,8 @@ story-refinement.agent.md: 358 lines
 
 **Stages:** [concise list]
 **Rules:** [concise rules]
-**Examples:** See copilot/examples/hotfix-examples.md
-**Detailed docs:** See copilot/specs/hotfix-specification.md
+**Examples:** See examples/hotfix-examples.md
+**Detailed docs:** See specs/hotfix-specification.md
 ```
 
 ---
@@ -393,8 +393,8 @@ DO NOT BATCH:
 
 **Recommended:** Pick ONE format and use consistently
 ```
-Standard: copilot/agents/orchestrator.agent.md
-From copilot/: agents/orchestrator.agent.md
+Standard (from project root): .github/agents/orchestrator.agent.md
+From .github/: agents/orchestrator.agent.md
 ```
 
 ---
@@ -475,7 +475,7 @@ From copilot/: agents/orchestrator.agent.md
 
 ## 📋 Specific File Recommendations
 
-### COPILOT_INTEGRATION.md
+### integration-overview.md
 **Current Length:** 294 lines
 **Status:** ✅ Good length
 **Improvements:**

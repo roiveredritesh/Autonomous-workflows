@@ -26,7 +26,7 @@ User: "Add Excel export [approve_before_stage: 6]"
 YOU DO:
 1. Parse flags: approve_before_stage: [6]
 2. Detect mode: "add" → FEATURE
-3. Load: copilot/agents/feature-delivery.agent.md
+3. Load: agents/feature-delivery.agent.md
 4. Configure: Checkpoint before stage 6
 5. Delegate: Execute with checkpoint at stage 6
 
