@@ -65,8 +65,6 @@ This framework provides structured workflows, specialized analysis skills, and c
 │   └── best-practices-audit.md
 │
 ├── OUTPUT_STRUCTURE.md            ← Output format specification
-├── APPROVAL_MECHANISM_ASSESSMENT.md
-├── FOLDERS_REVIEW.md
 └── README.md                      ← This file
 ```
 
