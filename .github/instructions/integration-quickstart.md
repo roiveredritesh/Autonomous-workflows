@@ -92,11 +92,10 @@ For detailed workflow execution, refer to: `instructions/integration-overview.md
 your-project/
 ├── .github/
 │   ├── copilot-instructions.md (your existing instructions + workflow reference)
-│   └── copilot/
-│       ├── instructions/ (including integration-overview.md)
-│       ├── specs/ (formal rules, mostly archived)
-│       ├── agents/ (workflow definitions)
-│       └── skills/ (capabilities)
+│   ├── instructions/ (including integration-overview.md)
+│   ├── specs/ (formal rules, mostly archived)
+│   ├── agents/ (workflow definitions)
+│   └── skills/ (capabilities)
 └── [your other files]
 ```
 

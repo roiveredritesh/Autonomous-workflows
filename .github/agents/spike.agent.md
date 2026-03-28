@@ -39,43 +39,24 @@ Orchestrates time-boxed investigation of unknowns with clear research questions 
 
 **User:** "Can we cache entire product catalog in Redis?"
 
-**YOU DO:**
-1. Define: "Can cache all products without memory/performance issues?"
-   - Success: Know memory footprint, refresh strategy, invalidation complexity
-   - Time box: 6 hours
-2. Investigate:
-   - Count: 50K products = 150MB serialized
-   - Test: Redis handles easily
-   - Measure: Cache refresh takes 2.3s
-   - Map: 23 invalidation points identified
-3. Document:
-   - HIGH confidence
-   - Risks: Cache stampede on refresh, complex invalidation
-   - Recommendation: Proceed with staged refresh
-4. Decision: PROCEED_WITH_CAUTION
+**YOU DELIVER:**
+- Research question defined: "Can cache all products without memory/performance issues?"
+- Success criteria: Know memory footprint, refresh strategy, invalidation complexity
+- Time box: 6 hours
+- Investigation findings:
+  - 50K products = 150MB serialized
+  - Redis handles easily
+  - Cache refresh takes 2.3s
+  - 23 invalidation points identified
+- HIGH confidence
+- Risks: Cache stampede on refresh, complex invalidation
+- Recommendation: Proceed with staged refresh
+- Decision: PROCEED_WITH_CAUTION
 
 **Output:** Complete investigation findings
 **Time:** 6 hours (within time box)
 **Confidence:** HIGH
 **Decision:** Proceed with mitigations
-
----
-
-## Execution Configuration
-
-```yaml
-default_mode: autonomous
-
-batch_stages:
-  investigation: [1, 2, 3, 4]
-
-auto_stop_triggers:
-  - time_box_exceeded == true → Time limit reached
-  - scope_creep_detected == true → Investigation expanded beyond charter
-  - confidence == HIGH && question_answered == true → Early success
-
-respects_flags: true
-```
 
 ---
 
@@ -89,17 +70,17 @@ respects_flags: true
 
 ---
 
-## 4-Stage Process
+## Workflow Phases
 
-### Stage 1: Spike Definition
+### Spike Definition
 
-**Skill:** `spike-charter`
-
-**Define:**
-- Research question (specific, answerable)
-- Success criteria (what would answer it)
-- Time box (hours or days)
-- Out of scope (what we're NOT investigating)
+**Charter the Investigation**
+- Use: `spike-charter` skill
+- Defines:
+  - Research question (specific, answerable)
+  - Success criteria (what would answer it)
+  - Time box (hours or days)
+  - Out of scope (what we're NOT investigating)
 
 **Example:**
 ```yaml
@@ -116,12 +97,12 @@ out_of_scope:
 
 ---
 
-### Stage 2: Investigation Plan
+### Investigation Planning
 
-**Create Hypothesis:**
+**Create Hypothesis**
 State what you expect to find and why.
 
-**Define Approach:**
+**Define Approach**
 ```yaml
 investigation_steps:
   1. "Review WebForms page lifecycle with async"
@@ -132,7 +113,7 @@ investigation_steps:
 
 ---
 
-### Stage 3: Execution
+### Investigation Execution
 
 **Invoke Skills Based on Investigation Type:**
 
@@ -143,22 +124,22 @@ investigation_steps:
 
 ---
 
-### Stage 4: Document Findings
+### Findings Documentation
 
-**Skill:** `spike-findings-recorder`
-
-**Output:**
-```yaml
-findings:
-  what_learned: [<discoveries>]
-  confidence_level: HIGH|MEDIUM|LOW
-  risks_identified: [<list>]
-  unknowns_remaining: [<list>]
-recommendations:
-  - <actionable next step 1>
-  - <actionable next step 2>
-decision: proceed|pivot|escalate|needs_more_investigation
-```
+**Record Results**
+- Use: `spike-findings-recorder` skill
+- Delivers:
+  ```yaml
+  findings:
+    what_learned: [<discoveries>]
+    confidence_level: HIGH|MEDIUM|LOW
+    risks_identified: [<list>]
+    unknowns_remaining: [<list>]
+  recommendations:
+    - <actionable next step 1>
+    - <actionable next step 2>
+  decision: proceed|pivot|escalate|needs_more_investigation
+  ```
 
 ---
 
@@ -179,7 +160,6 @@ decision: proceed|pivot|escalate|needs_more_investigation
 ❌ Omit confidence level
 ❌ Provide vague recommendations
 ❌ Continue indefinitely (know when to stop)
-❌ Present results without clear decision
 
 ---
 
@@ -303,7 +283,9 @@ decision: proceed|pivot|escalate|needs_more_investigation
 **Execution:**
 
 ```
-Stage 1: Definition
+SPIKE DEFINITION:
+
+Charter the Investigation
 → SKILL: spike-charter
 → OUTPUT:
   question: "Can we cache all products in Redis without memory/performance issues?"
@@ -316,16 +298,22 @@ Stage 1: Definition
     - Detailed cache key design
     - Monitoring implementation
 
-Stage 2: Plan
+INVESTIGATION PLANNING:
+
+Create Hypothesis
 → Hypothesis: "50K products will fit in Redis with acceptable refresh time"
-→ Approach:
+
+Define Approach
+→ Steps:
   1. Count products, calculate serialized size
   2. Test Redis memory with representative data
   3. Measure cache hit performance
   4. Map invalidation triggers
   5. Calculate refresh overhead
 
-Stage 3: Investigation
+INVESTIGATION EXECUTION:
+
+Invoke Skills
 → SKILLS: redis-key-inspector, data-model-explorer, performance-profiler
 → FINDINGS:
   - Product count: 50,000
@@ -336,7 +324,9 @@ Stage 3: Investigation
   - Invalidation points: 23 different triggers
   - Cache hit performance: <5ms
 
-Stage 4: Document
+FINDINGS DOCUMENTATION:
+
+Record Results
 → SKILL: spike-findings-recorder
 → OUTPUT:
   findings:
