@@ -1,0 +1,5 @@
+
+# Workflow execution outputs
+/output/
+# Keep review summaries only
+!/output/*/05-review-summary.md
